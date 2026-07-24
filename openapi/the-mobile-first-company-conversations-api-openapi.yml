@@ -1,0 +1,1068 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Conversations API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Conversations
+paths:
+  /v1/api/contact/{contact_id}/conversation:
+    get:
+      summary: Search Conversations
+      description: Search calls and SMS for a specific contact. Returns paginated results including call recordings, transcripts, AI summaries, and text messages.
+      operationId: getContactConversation
+      tags:
+      - Conversations
+      security:
+      - CallsAuth: []
+      parameters:
+      - name: contact_id
+        in: path
+        description: The unique identifier of the contact (e.g., "cnt_abc123")
+        required: true
+        schema:
+          type: string
+          example: cnt_abc123
+      - name: size
+        in: query
+        description: Number of results per page. Must be between 1 and 100.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+      - name: page
+        in: query
+        description: Page number (0-indexed).
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: allo_number
+        in: query
+        description: Filter conversations by a specific Allo phone number (E.164 format).
+        required: false
+        schema:
+          type: string
+          example: '+1234567890'
+      responses:
+        '200':
+          description: Conversation retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetContactConversationResponse'
+              example:
+                data:
+                  results:
+                  - type: CALL
+                    call:
+                      id: call_abc123
+                      from_number: '+1234567890'
+                      to_number: +0987654321
+                      length_in_minutes: 5.5
+                      type: INBOUND
+                      summary: Customer called about order status.
+                      tag: support
+                      tags:
+                      - support
+                      - order
+                      recording_url: https://storage.withallo.com/recordings/abc123.mp3
+                      start_date: '2024-01-15T10:30:00'
+                      transcript:
+                      - source: AGENT
+                        text: Hello, how can I help you today?
+                        time: '2024-01-15T10:30:05'
+                        start_seconds: 5
+                        end_seconds: 8.5
+                    message: null
+                  - type: TEXT_MESSAGE
+                    call: null
+                    message:
+                      from_number: '+1234567890'
+                      to_number: +0987654321
+                      type: OUTBOUND
+                      content: Thank you for contacting us!
+                      start_date: '2024-01-15T11:00:00'
+                  metadata:
+                    pagination:
+                      total_pages: 5
+                      current_page: 0
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: CONTACT_NOT_FOUND
+                details: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /v2/api/conversations:
+    get:
+      summary: List conversations
+      description: Returns a paginated list of conversations grouped by contact phone number, sorted by most recent activity.
+      operationId: listConversations
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: allo_number
+        in: query
+        required: true
+        description: Filter by Allo number (E.164). Required — list your numbers with GET /v2/api/numbers to find the right one.
+        schema:
+          type: string
+          example: '+14155550100'
+      - name: last_activity_since
+        in: query
+        description: Only return conversations with activity after this timestamp (ISO 8601). Ideal for incremental sync.
+        schema:
+          type: string
+          format: date-time
+          example: '2026-04-20T10:00:00Z'
+      - name: unread
+        in: query
+        schema:
+          type: boolean
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - $ref: '#/components/parameters/Extend'
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ConversationSummary'
+                - $ref: '#/components/schemas/PaginatedResponse'
+              example:
+                data:
+                - contact_number: '+14155551234'
+                  contacts:
+                  - id: cnt-abc123
+                    name: Sarah Johnson
+                    company:
+                      id: com-xyz789
+                      name: Acme Corp
+                    deals:
+                    - id: dea-def456
+                      name: Enterprise Plan
+                      status: open
+                  last_activity: '2026-04-21T14:30:00Z'
+                  last_item:
+                    id: cll-abc123
+                    type: CALL
+                    direction: INBOUND
+                    date: '2026-04-21T14:30:00Z'
+                    summary: Customer called about upgrading their plan.
+                    result: ANSWERED
+                    duration: 145
+                pagination:
+                  page: 1
+                  size: 20
+                  total_count: 156
+                  total_pages: 8
+                  has_more: true
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/search:
+    post:
+      summary: Search all conversations
+      description: Search and filter items across all conversations. Supports keyword search across transcripts, summaries, and message content.
+      operationId: searchAllConversations
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemSearchRequest'
+            example:
+              search: billing issues
+              type: CALL
+              sort: RELEVANCE
+              date:
+                from: '2026-01-01'
+                to: '2026-04-21'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ConversationItem'
+                - $ref: '#/components/schemas/PaginatedResponse'
+              example:
+                data:
+                - id: cll-abc123
+                  type: CALL
+                  direction: INBOUND
+                  allo_number: '+14155550100'
+                  contact_number: '+14155551234'
+                  contacts:
+                  - id: cnt-abc123
+                    name: Sarah Johnson
+                  user:
+                    id: usr-abc123
+                    name: Alex Kim
+                  date: '2026-04-21T14:30:00Z'
+                  duration: 145
+                  result: ANSWERED
+                  recording_url: https://storage.withallo.com/recordings/cll-abc123.mp3
+                  summary: Customer called about a billing issue on their last invoice.
+                  tags:
+                  - billing
+                  - support
+                pagination:
+                  page: 1
+                  size: 20
+                  total_count: 1
+                  total_pages: 1
+                  has_more: false
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/{id}:
+    get:
+      summary: Get conversation item
+      description: Returns a single call or SMS message by its ID.
+      operationId: getConversationItem
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Item ID (`cll-*` for calls, `msg-*` for messages)
+        schema:
+          type: string
+          example: cll-abc123
+      - $ref: '#/components/parameters/Extend'
+      responses:
+        '200':
+          description: Conversation item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ConversationItem'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/{id}/summary:
+    patch:
+      summary: Update call summary
+      description: 'Replace the markdown content of a call''s AI-generated summary.
+
+
+        Only call items have summaries — passing an SMS ID (`msg-*`) returns `400 INVALID_ITEM_ID`. If multiple completed summary templates exist on the same call, set `template_key` to disambiguate.'
+      operationId: updateCallSummary
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Call ID (`cll-*`)
+        schema:
+          type: string
+          example: cll-abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Full replacement markdown content. Max 100,000 characters.
+                  maxLength: 100000
+                template_key:
+                  type: string
+                  nullable: true
+                  enum:
+                  - MARKDOWN_CLASSIC
+                  - MARKDOWN_SHORT_CALL
+                  description: Required only when the call has more than one completed summary template.
+              required:
+              - content
+            example:
+              content: '# Summary
+
+
+                Customer asked about pricing for the Pro plan and confirmed a follow-up call next Tuesday.'
+      responses:
+        '200':
+          description: Updated summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CallSummary'
+              example:
+                data:
+                  id: cll-abc123
+                  content: '# Summary
+
+
+                    Customer asked about pricing for the Pro plan and confirmed a follow-up call next Tuesday.'
+                  version: 4
+                  updated_at: '2026-05-12T14:32:11'
+                  updated_by:
+                    id: usr-abc123
+                    name: Alex Kim
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/batch:
+    post:
+      summary: Get many conversation items
+      description: Returns multiple conversation items by their IDs in a single request. Use this to fetch full details (summary, tags, recording, etc.) for items returned by the analytics drilldown or any other list.
+      operationId: batchGetConversationItems
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of conversation item IDs (max 100)
+                  maxItems: 100
+              required:
+              - ids
+            example:
+              ids:
+              - cll-abc123
+              - cll-def456
+              - cll-ghi789
+      responses:
+        '200':
+          description: Conversation items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConversationItem'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/{contact_number}/action:
+    put:
+      summary: Execute conversation action
+      description: Execute an action on a conversation.
+      operationId: executeConversationAction
+      tags:
+      - Conversations
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: contact_number
+        in: path
+        required: true
+        description: The external phone number in E.164 format. URL-encode the `+` as `%2B`.
+        schema:
+          type: string
+          example: '+14155551234'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - READ
+                  - UNREAD
+                  - ARCHIVE
+                  - UNARCHIVE
+                  description: The action to execute.
+                allo_number:
+                  type: string
+                  description: Scope the action to a specific Allo number (E.164). Without this, the action applies across all lines.
+                  example: '+14155550100'
+              required:
+              - action
+            example:
+              action: READ
+              allo_number: '+14155550100'
+      responses:
+        '200':
+          description: Action executed successfully
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    CallSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Call ID this summary belongs to
+          example: cll-abc123
+        content:
+          type: string
+          nullable: true
+          description: Markdown summary content
+        version:
+          type: integer
+          format: int64
+          description: Optimistic-lock version. Increments on every successful update.
+          example: 4
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-05-12T14:32:11'
+        updated_by:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              example: usr-abc123
+            name:
+              type: string
+              nullable: true
+              example: Alex Kim
+    TextMessageApiResponse:
+      type: object
+      description: Sent SMS message details
+      properties:
+        from_number:
+          type: string
+          nullable: true
+          description: Phone number that sent the message. Null when sender_id is used instead.
+          example: '+1234567890'
+        sender_id:
+          type: string
+          nullable: true
+          description: Sender ID used for the message (alphanumeric identifier). Only populated when sending with a verified Sender ID (e.g., for France SMS). Null when from_number is used.
+          example: MyCompany
+        to_number:
+          type: string
+          description: Phone number that received the message
+          example: +0987654321
+        type:
+          type: string
+          enum:
+          - OUTBOUND
+          description: Direction of the message (always OUTBOUND for sent messages)
+        content:
+          type: string
+          description: Content of the SMS message
+          example: Hello, this is a test message
+        start_date:
+          type: string
+          format: date-time
+          description: When the message was sent
+          example: '2024-01-15T10:30:00'
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+    ConversationApiResponse:
+      type: object
+      description: Paginated conversation history with calls and messages
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationItemApiResponse'
+          description: List of conversation items (calls and messages)
+        metadata:
+          $ref: '#/components/schemas/PaginationMeta'
+    TranscriptEntry:
+      type: object
+      properties:
+        source:
+          type: string
+          enum:
+          - USER
+          - EXTERNAL
+        time:
+          type: string
+          format: date-time
+        text:
+          type: string
+    ConversationItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cll-abc123
+        type:
+          type: string
+          enum:
+          - CALL
+          - SMS
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        allo_number:
+          type: string
+          example: '+14155550100'
+        contact_number:
+          type: string
+          example: '+14155551234'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        user:
+          $ref: '#/components/schemas/UserRef'
+        date:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          nullable: true
+        result:
+          type: string
+          nullable: true
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED
+        recording_url:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        transcript:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/TranscriptEntry'
+        content:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+          enum:
+          - PENDING
+          - SENT
+          - DELIVERED
+          - FAILED
+        message_type:
+          type: string
+          nullable: true
+          enum:
+          - SMS
+          - MMS
+          - WHATSAPP
+    TranscriptRow:
+      type: object
+      description: A single row in the call transcript
+      properties:
+        source:
+          type: string
+          enum:
+          - AGENT
+          - EXTERNAL
+          - USER
+          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
+        text:
+          type: string
+          description: The transcribed text content
+          example: Hello, how can I help you today?
+        time:
+          type: string
+          format: date-time
+          description: When this transcript entry occurred (ISO 8601 format)
+          example: '2024-01-15T10:30:15'
+        start_seconds:
+          type: number
+          format: double
+          nullable: true
+          description: Start time of this segment in seconds from call start
+          example: 15
+        end_seconds:
+          type: number
+          format: double
+          nullable: true
+          description: End time of this segment in seconds from call start
+          example: 18.5
+    ConversationItemApiResponse:
+      type: object
+      description: A single item in the conversation (either a call or a message)
+      properties:
+        type:
+          type: string
+          enum:
+          - CALL
+          - TEXT_MESSAGE
+          description: Type of conversation item
+        call:
+          $ref: '#/components/schemas/CallApiResponse'
+          nullable: true
+          description: Call details (only present when type is CALL)
+        message:
+          $ref: '#/components/schemas/TextMessageApiResponse'
+          nullable: true
+          description: Message details (only present when type is TEXT_MESSAGE)
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    PaginatedResponse:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ConversationSummary:
+      type: object
+      properties:
+        contact_number:
+          type: string
+          example: '+14155551234'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        last_activity:
+          type: string
+          format: date-time
+        last_item:
+          $ref: '#/components/schemas/ConversationItem'
+    AnalyticsDateRange:
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date
+          description: Start date
+          example: '2026-03-25'
+        to:
+          type: string
+          format: date
+          description: End date
+          example: '2026-04-21'
+    CallApiResponse:
+      type: object
+      description: A call record with details about the conversation
+      properties:
+        id:
+          type: string
+          description: Unique call identifier
+          example: call_abc123
+        from_number:
+          type: string
+          description: Phone number that initiated the call (E.164 format or 'anonymous')
+          example: '+1234567890'
+        to_number:
+          type: string
+          nullable: true
+          description: Phone number that received the call
+          example: +0987654321
+        length_in_minutes:
+          type: number
+          format: double
+          description: Duration of the call in minutes
+          example: 5.5
+        type:
+          type: string
+          nullable: true
+          enum:
+          - INBOUND
+          - OUTBOUND
+          description: Direction of the call
+        result:
+          type: string
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED_AI
+          - TRANSFERRED_EXTERNAL
+          - BLOCKED
+          - FAILED
+          - FAILED_EXTERNAL
+          - RECEIVED
+          - CLOSED
+          description: 'The outcome of the call. For outbound calls that reached voicemail, this will be VOICEMAIL regardless of the routing result. Common values: ANSWERED (call was answered), VOICEMAIL (call went to voicemail), TRANSFERRED_AI (transferred to AI agent), BLOCKED (call was blocked)'
+          example: ANSWERED
+        summary:
+          type: string
+          nullable: true
+          description: AI-generated summary of the call conversation
+          example: Customer inquired about order status
+        tag:
+          type: string
+          nullable: true
+          description: Tag/category assigned to the call
+          example: support
+        recording_url:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to access the call recording
+        start_date:
+          type: string
+          format: date-time
+          description: When the call started (ISO 8601 format)
+          example: '2024-01-15T10:30:00'
+        transcript:
+          type: array
+          nullable: true
+          description: Transcript of the call conversation
+          items:
+            $ref: '#/components/schemas/TranscriptRow'
+    GetContactConversationResponse:
+      type: object
+      description: Standard response wrapper for contact conversation
+      properties:
+        data:
+          $ref: '#/components/schemas/ConversationApiResponse'
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cnt-abc123
+        name:
+          type: string
+          example: Sarah Johnson
+        company:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              example: com-xyz789
+            name:
+              type: string
+              example: Acme Corp
+        deals:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: dea-def456
+              name:
+                type: string
+                example: Enterprise Plan
+              status:
+                type: string
+                enum:
+                - OPEN
+                - WON
+                - LOST
+    ItemSearchRequest:
+      type: object
+      properties:
+        allo_number:
+          type: string
+        contact_number:
+          type: string
+        user_id:
+          type: string
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        type:
+          type: string
+          enum:
+          - CALL
+          - SMS
+          - ALL
+          default: ALL
+        result:
+          type: string
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED
+        tags:
+          type: array
+          items:
+            type: string
+        unread:
+          type: boolean
+        unresponded:
+          type: boolean
+        search:
+          type: string
+          description: Keyword search (not natural language). Extract keywords from the user's question. Terms are AND'd with prefix matching — 'billing refund' matches items containing both words, 'bill' matches 'billing'. Searches across call transcripts, summaries, and SMS content.
+        sort:
+          type: string
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - RELEVANCE
+          default: DATE_DESC
+        extend:
+          type: string
+        page:
+          type: integer
+          default: 1
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+        date:
+          $ref: '#/components/schemas/AnalyticsDateRange'
+          description: Date range to filter by
+    PaginationMeta:
+      type: object
+      description: Pagination metadata wrapper for contacts endpoint
+      nullable: true
+      properties:
+        pagination:
+          type: object
+          properties:
+            total_pages:
+              type: integer
+              example: 5
+            current_page:
+              type: integer
+              example: 0
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    Size:
+      name: size
+      in: query
+      description: Results per page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    Extend:
+      name: extend
+      in: query
+      description: 'Comma-separated optional fields. Supported: `transcript`'
+      schema:
+        type: string
+        example: transcript
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

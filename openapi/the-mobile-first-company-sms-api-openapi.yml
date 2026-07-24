@@ -1,0 +1,316 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics SMS API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: SMS
+  description: Send SMS messages to phone numbers using your Allo numbers.
+paths:
+  /v1/api/sms:
+    post:
+      summary: Send SMS (US)
+      description: Send an SMS message to a US phone number using one of your Allo phone numbers. The recipient must be in the same country as your Allo number.
+      operationId: sendSMS
+      tags:
+      - SMS
+      security:
+      - SmsAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendSMSRequest'
+            example:
+              from: '+1234567890'
+              to: +0987654321
+              message: Hello, this is a test message
+      responses:
+        '200':
+          description: SMS sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendSMSResponse'
+              example:
+                data:
+                  from_number: '+1234567890'
+                  sender_id: null
+                  to_number: +0987654321
+                  type: OUTBOUND
+                  content: Hello, this is a test message
+                  start_date: '2024-01-15T10:30:00'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                fromNumberNotFound:
+                  summary: From number not found
+                  value:
+                    code: FROM_NUMBER_NOT_FOUND
+                    details: null
+                invalidToNumber:
+                  summary: Invalid to number
+                  value:
+                    code: INVALID_TO_NUMBER
+                    details: null
+                toNumberCountryMismatch:
+                  summary: Country mismatch
+                  value:
+                    code: TO_NUMBER_COUNTRY_MISMATCH
+                    details: null
+                invalidLength:
+                  summary: Invalid message length
+                  value:
+                    code: INVALID_LENGTH
+                    details: null
+                providerNotSupported:
+                  summary: Provider not supported
+                  value:
+                    code: PROVIDER_NOT_SUPPORTED
+                    details: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /v1/api/sms#france:
+    post:
+      summary: Send SMS (France)
+      description: Send an SMS message to a French phone number using a verified Sender ID. The Sender ID must be verified by the Allo team before use. Contact support to register your Sender ID.
+      operationId: sendSMSFrance
+      tags:
+      - SMS
+      security:
+      - SmsAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendSMSFranceRequest'
+            example:
+              sender_id: MyCompany
+              to: '+33612345678'
+              message: Bonjour, ceci est un message de test
+      responses:
+        '200':
+          description: SMS sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendSMSResponse'
+              example:
+                data:
+                  from_number: null
+                  sender_id: MyCompany
+                  to_number: '+33612345678'
+                  type: OUTBOUND
+                  content: Bonjour, ceci est un message de test
+                  start_date: '2024-01-15T10:30:00'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidSenderId:
+                  summary: Invalid Sender ID
+                  value:
+                    code: INVALID_SENDER_ID
+                    details: null
+                senderIdNotActive:
+                  summary: Sender ID not active
+                  value:
+                    code: SENDER_ID_NOT_ACTIVE
+                    details: null
+                invalidToNumber:
+                  summary: Invalid to number
+                  value:
+                    code: INVALID_TO_NUMBER
+                    details: null
+                invalidLength:
+                  summary: Invalid message length
+                  value:
+                    code: INVALID_LENGTH
+                    details: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+  schemas:
+    SendSMSRequest:
+      type: object
+      description: Request body for sending an SMS message (US)
+      required:
+      - from
+      - to
+      - message
+      properties:
+        from:
+          type: string
+          description: Your Allo phone number (must be owned by your account)
+          example: '+1234567890'
+        to:
+          type: string
+          description: Recipient phone number (E.164 format, same country as 'from')
+          example: +0987654321
+        message:
+          type: string
+          description: Message content
+          minLength: 1
+          maxLength: 1000
+          example: Hello, this is a test message
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    SendSMSResponse:
+      type: object
+      description: Standard response wrapper for sent SMS
+      properties:
+        data:
+          $ref: '#/components/schemas/TextMessageApiResponse'
+    SendSMSFranceRequest:
+      type: object
+      description: Request body for sending an SMS message in France using a verified Sender ID
+      required:
+      - sender_id
+      - to
+      - message
+      properties:
+        sender_id:
+          type: string
+          description: Your verified Sender ID (must be verified by the Allo team). This is an alphanumeric identifier that will appear as the sender of the SMS.
+          example: MyCompany
+        to:
+          type: string
+          description: Recipient phone number in France (E.164 format, must start with +33)
+          example: '+33612345678'
+        message:
+          type: string
+          description: Message content
+          minLength: 1
+          maxLength: 1000
+          example: Bonjour, ceci est un message de test
+    TextMessageApiResponse:
+      type: object
+      description: Sent SMS message details
+      properties:
+        from_number:
+          type: string
+          nullable: true
+          description: Phone number that sent the message. Null when sender_id is used instead.
+          example: '+1234567890'
+        sender_id:
+          type: string
+          nullable: true
+          description: Sender ID used for the message (alphanumeric identifier). Only populated when sending with a verified Sender ID (e.g., for France SMS). Null when from_number is used.
+          example: MyCompany
+        to_number:
+          type: string
+          description: Phone number that received the message
+          example: +0987654321
+        type:
+          type: string
+          enum:
+          - OUTBOUND
+          description: Direction of the message (always OUTBOUND for sent messages)
+        content:
+          type: string
+          description: Content of the SMS message
+          example: Hello, this is a test message
+        start_date:
+          type: string
+          format: date-time
+          description: When the message was sent
+          example: '2024-01-15T10:30:00'
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

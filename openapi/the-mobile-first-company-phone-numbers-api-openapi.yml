@@ -1,0 +1,301 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Phone Numbers API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Phone Numbers
+  description: Retrieve information about your Allo phone numbers.
+paths:
+  /v1/api/numbers:
+    get:
+      summary: Get Phone Numbers
+      description: Retrieve all Allo phone numbers associated with your account. Returns basic information about each number including country, name, and sharing status.
+      operationId: getNumbers
+      tags:
+      - Phone Numbers
+      security:
+      - CallsAuth: []
+      responses:
+        '200':
+          description: Phone numbers retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNumbersResponse'
+              example:
+                data:
+                - number: '+1234567890'
+                  name: Main Line
+                  country: US
+                  is_shared_number: false
+                - number: '+33612345678'
+                  name: France Office
+                  country: FR
+                  is_shared_number: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /v2/api/numbers:
+    get:
+      summary: List phone numbers
+      description: Returns all phone numbers and sender IDs on your team.
+      operationId: listNumbers
+      tags:
+      - Phone Numbers
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of phone numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PhoneNumber'
+              example:
+                data:
+                - number: '+14155550100'
+                  name: Sales US
+                  country: US
+                  type: NUMBER
+                  capabilities:
+                  - VOICE
+                  - SMS
+                  - MMS
+                  users:
+                  - id: usr-abc123
+                    name: Adrien
+                    email: adrien@company.com
+                - number: '+33612345678'
+                  name: Support FR
+                  country: FR
+                  type: NUMBER
+                  capabilities:
+                  - VOICE
+                  users:
+                  - id: usr-abc123
+                    name: Adrien
+                    email: adrien@company.com
+                  - id: usr-def456
+                    name: Marie
+                    email: marie@company.com
+                - number: null
+                  name: Acme Corp
+                  country: FR
+                  type: SENDER_ID
+                  capabilities:
+                  - SMS
+                  users: []
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    PhoneNumber:
+      type: object
+      properties:
+        number:
+          type: string
+          nullable: true
+          description: Phone number in E.164 format (null for sender IDs)
+          example: '+14155550100'
+        name:
+          type: string
+          nullable: true
+          description: Display label
+          example: Sales US
+        country:
+          type: string
+          nullable: true
+          description: ISO country code
+          example: US
+        type:
+          type: string
+          enum:
+          - NUMBER
+          - SENDER_ID
+          description: Whether this is a phone number or a sender ID
+        capabilities:
+          type: array
+          description: Supported capabilities for this number.
+          items:
+            type: string
+            enum:
+            - VOICE
+            - SMS
+            - MMS
+          example:
+          - VOICE
+          - SMS
+          - MMS
+        users:
+          type: array
+          description: Team members with access to this number
+          items:
+            $ref: '#/components/schemas/UserRef'
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    GetNumbersResponse:
+      type: object
+      description: Standard response wrapper containing list of phone numbers
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneNumberApiResponse'
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    PhoneNumberApiResponse:
+      type: object
+      description: An Allo phone number with basic information
+      properties:
+        number:
+          type: string
+          nullable: true
+          description: Phone number in E.164 format
+          example: '+1234567890'
+        name:
+          type: string
+          nullable: true
+          description: Display name for the phone number
+          example: Main Line
+        country:
+          type: string
+          nullable: true
+          description: Two-letter country code (ISO 3166-1 alpha-2)
+          example: US
+        is_shared_number:
+          type: boolean
+          description: Whether this number is shared across team members
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

@@ -1,0 +1,203 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Tags API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Tags
+paths:
+  /v2/api/tags:
+    get:
+      summary: List tags
+      description: Returns all tags configured on the team.
+      operationId: listTags
+      tags:
+      - Tags
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+              example:
+                data:
+                - id: tag-abc123
+                  name: qualified
+                  color: '#00AA00'
+                - id: tag-def456
+                  name: follow_up
+                  color: '#FF8800'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/{id}/tags:
+    post:
+      summary: Add tags
+      description: Add one or more tags to a conversation item.
+      operationId: addTags
+      tags:
+      - Tags
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Call ID (`cll-*`)
+        schema:
+          type: string
+          example: cll-abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Tag keys to add
+              required:
+              - tags
+            example:
+              tags:
+              - qualified
+              - follow_up
+      responses:
+        '200':
+          description: Tags added successfully
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/conversations/items/{id}/tags/{tag}:
+    delete:
+      summary: Remove tag
+      description: Remove a tag from a conversation item.
+      operationId: removeTag
+      tags:
+      - Tags
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Call ID (`cll-*`)
+        schema:
+          type: string
+          example: cll-abc123
+      - name: tag
+        in: path
+        required: true
+        description: Tag key to remove
+        schema:
+          type: string
+          example: qualified
+      responses:
+        '200':
+          description: Tag removed successfully
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tag-abc123
+        name:
+          type: string
+          example: qualified
+        color:
+          type: string
+          example: '#00AA00'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

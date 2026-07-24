@@ -1,0 +1,687 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Contacts API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Contacts
+  description: Search and retrieve contact information with sorting and pagination. Includes engagement level tracking.
+paths:
+  /v1/api/contacts:
+    get:
+      summary: Search Contacts
+      description: Search and filter contacts with sorting and pagination support. Returns contacts with engagement level information.
+      operationId: searchContacts
+      tags:
+      - Contacts
+      security:
+      - ContactsAuth: []
+      parameters:
+      - name: size
+        in: query
+        description: Number of results per page. Must be between 1 and 100.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+      - name: page
+        in: query
+        description: Page number (0-indexed).
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      responses:
+        '200':
+          description: Contacts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchContactsApiResponse'
+              example:
+                data:
+                  results:
+                  - id: cnt_abc123
+                    name: John
+                    last_name: Doe
+                    company:
+                      name: Acme Corp
+                      id: com_xyz789
+                    job_title: Manager
+                    website: null
+                    status: active
+                    is_archived: false
+                    created_at: '2024-01-10T08:00:00'
+                    updated_at: '2024-01-15T10:30:00'
+                    numbers:
+                    - '+1234567890'
+                    is_whitelisted: true
+                    last_activity_date: '2024-01-15T10:30:00'
+                    engagement: ENGAGED
+                  metadata:
+                    pagination:
+                      total_pages: 5
+                      current_page: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    post:
+      summary: Create Contact
+      description: Create a new contact in your Allo account. At least one phone number is required.
+      operationId: createContact
+      tags:
+      - Contacts
+      security:
+      - ContactsWriteAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+            example:
+              name: John
+              last_name: Doe
+              job_title: CEO
+              website: https://acme.com
+              emails:
+              - john@acme.com
+              numbers:
+              - '+15551234567'
+      responses:
+        '200':
+          description: Contact created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactApiResponse'
+              example:
+                data:
+                  id: cnt_abc123
+                  name: John
+                  last_name: Doe
+                  job_title: CEO
+                  website: https://acme.com
+                  status: null
+                  is_archived: false
+                  created_at: '2024-01-21T10:30:00'
+                  updated_at: '2024-01-21T10:30:00'
+                  numbers:
+                  - '+15551234567'
+                  is_whitelisted: false
+                  last_activity_date: '2024-01-21T10:30:00'
+                  engagement: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /v1/api/contacts/{contact_id}:
+    put:
+      summary: Update Contact
+      description: Update an existing contact. Only provided fields will be updated. Arrays (emails, numbers, addresses) replace existing values entirely.
+      operationId: updateContact
+      tags:
+      - Contacts
+      security:
+      - ContactsWriteAuth: []
+      parameters:
+      - name: contact_id
+        in: path
+        description: The unique identifier of the contact to update (e.g., "cnt_abc123")
+        required: true
+        schema:
+          type: string
+          example: cnt_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+            example:
+              name: John
+              last_name: Smith
+              job_title: CTO
+              emails:
+              - john.smith@acme.com
+              - john@personal.com
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactApiResponse'
+              example:
+                data:
+                  id: cnt_abc123
+                  name: John
+                  last_name: Smith
+                  job_title: CTO
+                  website: https://acme.com
+                  status: null
+                  is_archived: false
+                  created_at: '2024-01-21T10:30:00'
+                  updated_at: '2024-01-21T11:00:00'
+                  numbers:
+                  - '+15551234567'
+                  is_whitelisted: false
+                  last_activity_date: '2024-01-21T11:00:00'
+                  engagement: null
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: CONTACT_NOT_FOUND
+                details: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /v1/api/contact/{contact_id}:
+    get:
+      summary: Get Contact
+      description: Get detailed information for a specific contact by ID.
+      operationId: getContactContext
+      tags:
+      - Contacts
+      security:
+      - ContactsAuth: []
+      parameters:
+      - name: contact_id
+        in: path
+        description: The unique identifier of the contact (e.g., "cnt_abc123")
+        required: true
+        schema:
+          type: string
+          example: cnt_abc123
+      - name: extend
+        in: query
+        description: 'Comma-separated list of additional data to include. Available options: `engagement` (includes engagement level), `activity` (includes recent communication activities).'
+        required: false
+        schema:
+          type: string
+          example: engagement,activity
+      responses:
+        '200':
+          description: Contact context retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetContactContextResponse'
+              example:
+                data:
+                  id: cnt_abc123
+                  name: John
+                  last_name: Doe
+                  numbers:
+                  - '+1234567890'
+                  emails:
+                  - john@acme.com
+                  company:
+                    name: Acme Corp
+                    id: com_xyz789
+                  job_title: CEO
+                  website: https://acme.com
+                  integration_data:
+                    HUBSPOT:
+                      contact_id: '12345'
+                      deal_stage: Negotiation
+                  custom_properties:
+                    preferred_language: English
+                    vip_status: true
+                  engagement: ENGAGED
+                  activity:
+                  - type: INBOUND_CALL
+                    made_by: John Doe
+                    made_at: '2024-01-15T10:30:00'
+                    allo_number: '+1234567890'
+                    content: null
+                  - type: OUTBOUND_SMS
+                    made_by: Jane Smith
+                    made_at: '2024-01-14T09:15:00'
+                    allo_number: null
+                    content: Thank you for your call. We will follow up shortly.
+                  conversation_url: /v1/api/contact/cnt_abc123/conversation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: CONTACT_NOT_FOUND
+                details: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+components:
+  schemas:
+    GetContactContextResponse:
+      type: object
+      description: Standard response wrapper for contact context
+      properties:
+        data:
+          $ref: '#/components/schemas/ContactContextApiResponse'
+    ContactApiResponse:
+      type: object
+      description: Standard response wrapper for a single contact
+      properties:
+        data:
+          $ref: '#/components/schemas/ContactWithEngagementApiResponse'
+    PaginationMeta:
+      type: object
+      description: Pagination metadata wrapper for contacts endpoint
+      nullable: true
+      properties:
+        pagination:
+          type: object
+          properties:
+            total_pages:
+              type: integer
+              example: 5
+            current_page:
+              type: integer
+              example: 0
+    ContactContextApiResponse:
+      type: object
+      description: Comprehensive contact context including integration data and activity
+      properties:
+        id:
+          type: string
+          description: Unique contact identifier
+          example: cnt_abc123
+        name:
+          type: string
+          nullable: true
+          description: First name
+          example: John
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+          example: Doe
+        numbers:
+          type: array
+          items:
+            type: string
+          description: List of phone numbers
+          example:
+          - '+1234567890'
+        emails:
+          type: array
+          items:
+            type: string
+          description: List of email addresses
+          example:
+          - john@acme.com
+        company:
+          type: object
+          nullable: true
+          description: Company information
+          properties:
+            name:
+              type: string
+              nullable: true
+              example: Acme Corp
+            id:
+              type: string
+              nullable: true
+              example: com_xyz789
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+          example: CEO
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+          example: https://acme.com
+        integration_data:
+          type: object
+          description: Data from connected CRM integrations, keyed by integration type (e.g., HUBSPOT, SALESFORCE, PIPEDRIVE)
+          additionalProperties:
+            type: object
+            additionalProperties: true
+          example:
+            HUBSPOT:
+              contact_id: '12345'
+              deal_stage: Negotiation
+        custom_properties:
+          type: object
+          nullable: true
+          description: Custom properties defined for this contact
+          additionalProperties: true
+          example:
+            preferred_language: English
+            vip_status: true
+        engagement:
+          type: string
+          nullable: true
+          enum:
+          - ENGAGED
+          - COOLING
+          - COLD
+          description: Engagement level of the contact. Only included when `extend=engagement` is specified.
+        activity:
+          type: array
+          nullable: true
+          description: Recent communication activities with this contact (calls and SMS). Only included when `extend=activity` is specified.
+          items:
+            $ref: '#/components/schemas/ContactActivityApiResponse'
+        conversation_url:
+          type: string
+          description: URL path to retrieve the full conversation history for this contact
+          example: /v1/api/contact/cnt_abc123/conversation
+    CreateContactRequest:
+      type: object
+      description: Request body for creating a new contact
+      required:
+      - numbers
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: First name
+          example: John
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+          example: Doe
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+          example: CEO
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+          example: https://acme.com
+        emails:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Email addresses
+          example:
+          - john@acme.com
+        numbers:
+          type: array
+          items:
+            type: string
+          description: Phone numbers (at least one required, E.164 format)
+          example:
+          - '+15551234567'
+    UpdateContactRequest:
+      type: object
+      description: Request body for updating an existing contact. Only provided fields will be updated.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: First name
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+        emails:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Email addresses (replaces all existing emails)
+        numbers:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Phone numbers (replaces all existing numbers)
+    ContactActivityApiResponse:
+      type: object
+      description: A communication activity (call or SMS) with a contact
+      required:
+      - type
+      - made_at
+      properties:
+        type:
+          type: string
+          enum:
+          - INBOUND_CALL
+          - OUTBOUND_CALL
+          - INBOUND_SMS
+          - OUTBOUND_SMS
+          description: 'Type of communication activity. Possible values:
+
+            - `INBOUND_CALL`: An incoming call from the contact
+
+            - `OUTBOUND_CALL`: An outgoing call to the contact
+
+            - `INBOUND_SMS`: An incoming SMS from the contact
+
+            - `OUTBOUND_SMS`: An outgoing SMS to the contact'
+        made_by:
+          type: string
+          nullable: true
+          description: Name of the team member who handled the activity
+          example: John Doe
+        made_at:
+          type: string
+          format: date-time
+          description: When the activity occurred (ISO 8601 format)
+          example: '2024-01-15T10:30:00'
+        allo_number:
+          type: string
+          nullable: true
+          description: The Allo phone number used for the call. Only present for call activities (INBOUND_CALL, OUTBOUND_CALL).
+          example: '+1234567890'
+        content:
+          type: string
+          nullable: true
+          description: The content/text of the SMS message. Only present for SMS activities (INBOUND_SMS, OUTBOUND_SMS).
+          example: Hello, this is a test message
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    SearchContactsApiResponse:
+      type: object
+      description: Standard response wrapper for paginated contact results
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              nullable: true
+              items:
+                $ref: '#/components/schemas/ContactWithEngagementApiResponse'
+            metadata:
+              $ref: '#/components/schemas/PaginationMeta'
+    ContactWithEngagementApiResponse:
+      type: object
+      description: A contact record with engagement information
+      properties:
+        id:
+          type: string
+          description: Unique contact identifier
+          example: cnt_abc123
+        name:
+          type: string
+          nullable: true
+          description: First name
+          example: John
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+          example: Doe
+        company:
+          type: object
+          nullable: true
+          description: Company information
+          properties:
+            name:
+              type: string
+              nullable: true
+              example: Acme Corp
+            id:
+              type: string
+              nullable: true
+              example: com_xyz789
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+          example: Manager
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+        status:
+          type: string
+          nullable: true
+          description: Contact status
+          example: active
+        is_archived:
+          type: boolean
+          description: Whether the contact is archived
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the contact was created
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the contact was last updated
+        numbers:
+          type: array
+          items:
+            type: string
+          description: List of phone numbers
+          example:
+          - '+1234567890'
+        is_whitelisted:
+          type: boolean
+          description: Whether the contact is whitelisted
+        last_activity_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date of the last activity
+        engagement:
+          type: string
+          nullable: true
+          enum:
+          - ENGAGED
+          - COOLING
+          - COLD
+          description: Engagement level of the contact
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+  responses:
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

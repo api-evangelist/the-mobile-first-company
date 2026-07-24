@@ -1,0 +1,470 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Summary Templates API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Summary Templates
+  description: Manage call summary templates that control how AI-generated call summaries are structured for your team.
+paths:
+  /v2/api/numbers/{number}/default_summary_template:
+    put:
+      summary: Set number default summary template
+      description: Sets or clears the default summary template used for a phone number's call summaries. Pass `summary_template_id` to set it, or null/omit to clear it.
+      operationId: setNumberDefaultSummaryTemplate
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: number
+        in: path
+        required: true
+        description: Allo phone number in E.164 format
+        schema:
+          type: string
+          example: '+14155551234'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                summary_template_id:
+                  type: string
+                  nullable: true
+                  description: Summary template ID (`tst-*`) to set as the default, or null to clear.
+                  example: tst-abc123
+            example:
+              summary_template_id: tst-abc123
+      responses:
+        '200':
+          description: Default summary template updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      number:
+                        type: string
+                        example: '+14155551234'
+                      default_summary_template_id:
+                        type: string
+                        nullable: true
+                        example: tst-abc123
+              example:
+                data:
+                  number: '+14155551234'
+                  default_summary_template_id: tst-abc123
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/summary_templates:
+    get:
+      summary: List summary templates
+      description: Returns the team's call summary templates.
+      operationId: listSummaryTemplates
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of summary templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SummaryTemplate'
+              example:
+                data:
+                - id: tst-abc123
+                  name: Sales call
+                  call_context: B2B SaaS sales calls
+                  icon: 📞
+                  sections:
+                  - title: Pain points
+                    instructions: List the prospect's pain points
+                    order: 0
+                  - title: Next steps
+                    instructions: What was agreed
+                    order: 1
+                  created_at: '2026-06-01T10:00:00'
+                  updated_at: '2026-06-01T10:00:00'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    post:
+      summary: Create summary template
+      description: Creates a call summary template for the team.
+      operationId: createSummaryTemplate
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Template name.
+                  example: Sales call
+                call_context:
+                  type: string
+                  nullable: true
+                  description: Background context that helps the AI summarize calls (max 4000 characters).
+                  example: B2B SaaS sales calls
+                icon:
+                  type: string
+                  nullable: true
+                  description: Optional icon (e.g. an emoji).
+                  example: 📞
+                sections:
+                  type: array
+                  maxItems: 10
+                  items:
+                    $ref: '#/components/schemas/SummaryTemplateSection'
+                  description: Ordered sections that make up the summary (max 10).
+              required:
+              - name
+            example:
+              name: Sales call
+              call_context: B2B SaaS sales calls
+              icon: 📞
+              sections:
+              - title: Pain points
+                instructions: List the prospect's pain points
+                order: 0
+              - title: Next steps
+                instructions: What was agreed
+                order: 1
+      responses:
+        '201':
+          description: Summary template created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SummaryTemplate'
+              example:
+                data:
+                  id: tst-abc123
+                  name: Sales call
+                  call_context: B2B SaaS sales calls
+                  icon: 📞
+                  sections:
+                  - title: Pain points
+                    instructions: List the prospect's pain points
+                    order: 0
+                  - title: Next steps
+                    instructions: What was agreed
+                    order: 1
+                  created_at: '2026-06-01T10:00:00'
+                  updated_at: '2026-06-01T10:00:00'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/summary_templates/{id}:
+    get:
+      summary: Get summary template
+      description: Returns a single call summary template by ID.
+      operationId: getSummaryTemplate
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Summary template ID (`tst-*`)
+        schema:
+          type: string
+          example: tst-abc123
+      responses:
+        '200':
+          description: Summary template
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SummaryTemplate'
+              example:
+                data:
+                  id: tst-abc123
+                  name: Sales call
+                  call_context: B2B SaaS sales calls
+                  icon: 📞
+                  sections:
+                  - title: Pain points
+                    instructions: List the prospect's pain points
+                    order: 0
+                  - title: Next steps
+                    instructions: What was agreed
+                    order: 1
+                  created_at: '2026-06-01T10:00:00'
+                  updated_at: '2026-06-01T10:00:00'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    put:
+      summary: Update summary template
+      description: Replaces a summary template's name, call context, icon, and sections.
+      operationId: updateSummaryTemplate
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Summary template ID (`tst-*`)
+        schema:
+          type: string
+          example: tst-abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Template name.
+                  example: Sales call
+                call_context:
+                  type: string
+                  nullable: true
+                  description: Background context that helps the AI summarize calls (max 4000 characters).
+                  example: B2B SaaS sales calls
+                icon:
+                  type: string
+                  nullable: true
+                  description: Optional icon (e.g. an emoji).
+                  example: 📞
+                sections:
+                  type: array
+                  maxItems: 10
+                  items:
+                    $ref: '#/components/schemas/SummaryTemplateSection'
+                  description: Ordered sections that make up the summary (max 10).
+              required:
+              - name
+            example:
+              name: Sales call
+              call_context: B2B SaaS sales calls
+              icon: 📞
+              sections:
+              - title: Pain points
+                instructions: List the prospect's pain points
+                order: 0
+              - title: Next steps
+                instructions: What was agreed
+                order: 1
+      responses:
+        '200':
+          description: Summary template updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SummaryTemplate'
+              example:
+                data:
+                  id: tst-abc123
+                  name: Sales call
+                  call_context: B2B SaaS sales calls
+                  icon: 📞
+                  sections:
+                  - title: Pain points
+                    instructions: List the prospect's pain points
+                    order: 0
+                  - title: Next steps
+                    instructions: What was agreed
+                    order: 1
+                  created_at: '2026-06-01T10:00:00'
+                  updated_at: '2026-06-01T10:00:00'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    delete:
+      summary: Delete summary template
+      description: Soft-deletes (deactivates) a summary template.
+      operationId: deleteSummaryTemplate
+      tags:
+      - Summary Templates
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Summary template ID (`tst-*`)
+        schema:
+          type: string
+          example: tst-abc123
+      responses:
+        '204':
+          description: Summary template deleted
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    SummaryTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tst-abc123
+        name:
+          type: string
+          example: Sales call
+        call_context:
+          type: string
+          nullable: true
+          example: B2B SaaS sales calls
+        icon:
+          type: string
+          nullable: true
+          example: 📞
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/SummaryTemplateSection'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    SummaryTemplateSection:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Pain points
+        instructions:
+          type: string
+          example: List the prospect's pain points
+        order:
+          type: integer
+          description: 0-based position of the section in the summary.
+          example: 0
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

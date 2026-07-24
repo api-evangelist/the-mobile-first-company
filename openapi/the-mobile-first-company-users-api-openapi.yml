@@ -1,0 +1,313 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Users API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Users
+paths:
+  /v2/api/me:
+    get:
+      summary: Me
+      description: 'Returns information about the authenticated API key: its scopes, available endpoints, team, and rate limits. No specific scope is required — any valid API key can call this endpoint.
+
+
+        Agents should call this endpoint first to discover their capabilities before making other API calls.'
+      operationId: getMe
+      tags:
+      - Users
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: API key info retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MeResponse'
+              example:
+                data:
+                  api_key_id: api-abc123def456
+                  scopes:
+                  - CONVERSATIONS_READ
+                  - PHONE_NUMBERS_READ
+                  - TAGS_READ
+                  - TAGS_WRITE
+                  - USERS_READ
+                  endpoints:
+                  - method: GET
+                    path: /v2/api/conversations
+                    description: List conversations grouped by contact number
+                    scope: CONVERSATIONS_READ
+                  - method: POST
+                    path: /v2/api/conversations/items/search
+                    description: Search calls and SMS with filters and keyword search
+                    scope: CONVERSATIONS_READ
+                  - method: GET
+                    path: /v2/api/tags
+                    description: List all available tags
+                    scope: TAGS_READ
+                  - method: GET
+                    path: /v2/api/users
+                    description: List team members with roles and assigned numbers
+                    scope: USERS_READ
+                  - method: GET
+                    path: /v2/api/numbers
+                    description: List phone numbers with capabilities and member access
+                    scope: PHONE_NUMBERS_READ
+                  team:
+                    id: team-xyz789
+                    name: Acme Sales
+                  rate_limits:
+                    read_per_second: 20
+                    write_per_second: 5
+        '401':
+          description: Invalid or missing API key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/users:
+    get:
+      summary: List users
+      description: Returns all team members.
+      operationId: listUsers
+      tags:
+      - Users
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: role
+        in: query
+        schema:
+          type: string
+          enum:
+          - ADMIN
+          - MANAGER
+          - MEMBER
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+          default: ACTIVE
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+              example:
+                data:
+                - id: usr-abc123
+                  name: Alex Kim
+                  email: alex@acme.com
+                  role: ADMIN
+                  status: ACTIVE
+                  image_url: https://storage.withallo.com/avatars/usr-abc123.jpg
+                - id: usr-def456
+                  name: Jordan Lee
+                  email: jordan@acme.com
+                  role: MEMBER
+                  status: ACTIVE
+                  image_url: null
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/users/{id}:
+    get:
+      summary: Get user
+      description: Returns a single team member by their ID.
+      operationId: getUser
+      tags:
+      - Users
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: usr-abc123
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: Adrien
+        email:
+          type: string
+          example: adrien@company.com
+        role:
+          type: string
+          enum:
+          - ADMIN
+          - MANAGER
+          - MEMBER
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+        image_url:
+          type: string
+          nullable: true
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+    MeResponse:
+      type: object
+      description: Information about the authenticated API key and its capabilities
+      properties:
+        api_key_id:
+          type: string
+          description: Unique identifier of this API key
+        scopes:
+          type: array
+          description: Scopes granted to this key. Determines which endpoints appear in the endpoints list
+          items:
+            type: string
+        endpoints:
+          type: array
+          description: Endpoints this key can call, filtered by granted scopes
+          items:
+            type: object
+            properties:
+              method:
+                type: string
+                description: HTTP method
+                enum:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+              path:
+                type: string
+                description: Endpoint path with parameter placeholders
+              description:
+                type: string
+                description: What the endpoint does
+              scope:
+                type: string
+                description: The scope that grants access to this endpoint
+        team:
+          type: object
+          nullable: true
+          description: The team this key belongs to. Null if the user has no team
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        rate_limits:
+          type: object
+          description: Request rate limits for this API key
+          properties:
+            read_per_second:
+              type: integer
+              description: Maximum GET requests per second
+            write_per_second:
+              type: integer
+              description: Maximum POST/PUT/DELETE requests per second
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

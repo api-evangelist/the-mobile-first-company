@@ -1,0 +1,420 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Webhooks API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Webhooks
+  description: Manage webhook endpoints to receive real-time notifications about events in your Allo account. Each endpoint subscribes to one or more event topics and is verified with a signing secret.
+paths:
+  /v2/api/webhooks:
+    get:
+      summary: List webhooks
+      description: Returns all webhook endpoints configured for your account.
+      operationId: listWebhooks
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of webhook endpoints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookApiResponse'
+              example:
+                data:
+                - id: ep_2NfDKEm9sF8xK3pQr1Zt
+                  url: https://example.com/webhooks/allo
+                  topics:
+                  - call.received
+                  - sms.received
+                  description: Production event stream
+                  enabled: true
+                  created_at: '2026-04-21T14:30:00Z'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    post:
+      summary: Create webhook
+      description: Creates a webhook endpoint subscribed to one or more event topics. The `signing_secret` is returned only in this response — store it to verify delivery signatures.
+      operationId: createWebhook
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookApiRequest'
+            example:
+              url: https://example.com/webhooks/allo
+              topics:
+              - call.received
+              - sms.received
+              description: Production event stream
+      responses:
+        '201':
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WebhookApiResponse'
+              example:
+                data:
+                  id: ep_2NfDKEm9sF8xK3pQr1Zt
+                  url: https://example.com/webhooks/allo
+                  topics:
+                  - call.received
+                  - sms.received
+                  description: Production event stream
+                  enabled: true
+                  signing_secret: whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7oD
+                  created_at: '2026-04-21T14:30:00Z'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/webhooks/{webhook_id}:
+    get:
+      summary: Get webhook
+      description: Returns a single webhook endpoint by ID, including its `signing_secret`.
+      operationId: getWebhook
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        description: The webhook endpoint ID (e.g. "ep_2NfDKEm9sF8xK3pQr1Zt").
+        schema:
+          type: string
+          example: ep_2NfDKEm9sF8xK3pQr1Zt
+      responses:
+        '200':
+          description: Webhook endpoint
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WebhookApiResponse'
+              example:
+                data:
+                  id: ep_2NfDKEm9sF8xK3pQr1Zt
+                  url: https://example.com/webhooks/allo
+                  topics:
+                  - call.received
+                  - sms.received
+                  description: Production event stream
+                  enabled: true
+                  signing_secret: whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7oD
+                  created_at: '2026-04-21T14:30:00Z'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    put:
+      summary: Update webhook
+      description: Updates a webhook endpoint. Only the fields you provide are changed. Omitted fields are left untouched.
+      operationId: updateWebhook
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        description: The webhook endpoint ID (e.g. "ep_2NfDKEm9sF8xK3pQr1Zt").
+        schema:
+          type: string
+          example: ep_2NfDKEm9sF8xK3pQr1Zt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookApiRequest'
+            example:
+              topics:
+              - call.received
+              - call.completed
+              enabled: false
+      responses:
+        '200':
+          description: Webhook updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WebhookApiResponse'
+              example:
+                data:
+                  id: ep_2NfDKEm9sF8xK3pQr1Zt
+                  url: https://example.com/webhooks/allo
+                  topics:
+                  - call.received
+                  - sms.received
+                  description: Production event stream
+                  enabled: true
+                  created_at: '2026-04-21T14:30:00Z'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    delete:
+      summary: Delete webhook
+      description: Permanently deletes a webhook endpoint and its delivery history.
+      operationId: deleteWebhook
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        description: The webhook endpoint ID (e.g. "ep_2NfDKEm9sF8xK3pQr1Zt").
+        schema:
+          type: string
+          example: ep_2NfDKEm9sF8xK3pQr1Zt
+      responses:
+        '204':
+          description: Webhook deleted
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/webhooks/event_types:
+    get:
+      summary: List event types
+      description: Returns the catalog of event topics you can subscribe a webhook to.
+      operationId: listWebhookEventTypes
+      tags:
+      - Webhooks
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Available event types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookEventTypeApiResponse'
+              example:
+                data:
+                - name: call.received
+                  description: Inbound call received
+                - name: sms.sent
+                  description: Outbound sms sent
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    WebhookTopic:
+      type: string
+      enum:
+      - call.received
+      - call.triggered
+      - call.answered
+      - call.completed
+      - tag.added
+      - tag.removed
+      - sms.received
+      - sms.sent
+      - contact.created
+      - contact.updated
+      - summary.updated
+      description: An event topic. See the Event Catalog for payloads.
+      example: call.received
+    CreateWebhookApiRequest:
+      type: object
+      required:
+      - url
+      - topics
+      properties:
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL that will receive event deliveries.
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopic'
+          description: Event topics to subscribe to (at least one).
+        description:
+          type: string
+          description: Optional human-readable label.
+    UpdateWebhookApiRequest:
+      type: object
+      description: All fields optional. Only the fields you provide are changed.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: New HTTPS delivery URL.
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopic'
+          description: Replacement set of event topics.
+        description:
+          type: string
+          description: New label.
+        enabled:
+          type: boolean
+          description: Enable or disable the endpoint.
+    WebhookApiResponse:
+      type: object
+      description: A webhook endpoint.
+      properties:
+        id:
+          type: string
+          description: Unique webhook endpoint ID.
+          example: ep_2NfDKEm9sF8xK3pQr1Zt
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL that receives event deliveries.
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopic'
+          description: Event topics this endpoint is subscribed to.
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable label.
+        enabled:
+          type: boolean
+          description: Whether the endpoint is active.
+        signing_secret:
+          type: string
+          nullable: true
+          description: Secret used to verify delivery signatures. Returned only when the webhook is created or fetched by ID.
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the endpoint was created.
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+    WebhookEventTypeApiResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: call.received
+        description:
+          type: string
+          example: Inbound call received
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

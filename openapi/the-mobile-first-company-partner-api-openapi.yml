@@ -1,0 +1,329 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Partner API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Partner
+paths:
+  /v2/api/partner/accounts:
+    post:
+      summary: Create account
+      description: Creates an Allo account for one of your customers, provisions a phone number, and returns a scoped API key for the account. Requires the `PARTNER` scope. The account is billed as one seat on your subscription.
+      operationId: createPartnerAccount
+      tags:
+      - Partner
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - name
+              - personal_mobile
+              - number_preference
+              properties:
+                email:
+                  type: string
+                  description: Becomes the account's login.
+                  example: client@example.com
+                name:
+                  type: string
+                  example: Jane Doe
+                personal_mobile:
+                  type: string
+                  description: Mandatory — an existing mobile the secondary number attaches to.
+                  example: '+33612345678'
+                partner_client_ref:
+                  type: string
+                  description: Your own reference for this customer. Echoed back and on the activation webhook.
+                  example: crm-12345
+                number_preference:
+                  type: object
+                  required:
+                  - country
+                  properties:
+                    country:
+                      type: string
+                      description: ISO country code.
+                      example: FR
+                    prefix:
+                      type: string
+                      nullable: true
+                      example: '+337'
+            example:
+              email: client@example.com
+              name: Jane Doe
+              personal_mobile: '+33612345678'
+              partner_client_ref: crm-12345
+              number_preference:
+                country: FR
+                prefix: '+337'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: usr_2Nf...
+                      api_key:
+                        type: string
+                        nullable: true
+                        description: Scoped API key for the new account. Returned only on create.
+                        example: b1c2...
+                      phone_numbers:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                        - '+33712345678'
+                      status:
+                        type: string
+                        example: ACTIVE
+                      activated:
+                        type: boolean
+                        description: True once the customer has signed in on a device.
+                        example: false
+                      partner_client_ref:
+                        type: string
+                        nullable: true
+                        example: crm-12345
+              example:
+                data:
+                  id: usr_2Nf...
+                  api_key: b1c2...
+                  phone_numbers:
+                  - '+33712345678'
+                  status: ACTIVE
+                  activated: false
+                  partner_client_ref: crm-12345
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '402':
+          description: Billing error — could not add a seat to your subscription (PARTNER_SUBSCRIPTION_NOT_BILLABLE / PARTNER_BILLING_FAILED).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '403':
+          description: The API key lacks the PARTNER scope.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '409':
+          description: An account already exists (PARTNER_ACCOUNT_ALREADY_EXISTS) or no number is available (NO_NUMBER_AVAILABLE).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/partner/accounts/{id}:
+    get:
+      summary: Get account
+      description: Returns the status and activation state of an account you provisioned. Requires the `PARTNER` scope.
+      operationId: getPartnerAccount
+      tags:
+      - Partner
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The account id returned on create.
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: usr_2Nf...
+                      api_key:
+                        type: string
+                        nullable: true
+                        description: Scoped API key for the new account. Returned only on create.
+                        example: b1c2...
+                      phone_numbers:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                        - '+33712345678'
+                      status:
+                        type: string
+                        example: ACTIVE
+                      activated:
+                        type: boolean
+                        description: True once the customer has signed in on a device.
+                        example: false
+                      partner_client_ref:
+                        type: string
+                        nullable: true
+                        example: crm-12345
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '403':
+          description: The API key lacks the PARTNER scope.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '404':
+          description: No account with this id was provisioned by your API key (PARTNER_ACCOUNT_NOT_FOUND).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    delete:
+      summary: Deactivate account
+      description: Deactivates an account you provisioned and releases its seat. The account stays active until the end of the current paid period, then expires. Requires the `PARTNER` scope.
+      operationId: deletePartnerAccount
+      tags:
+      - Partner
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Account deactivated
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '403':
+          description: The API key lacks the PARTNER scope.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '404':
+          description: No account with this id was provisioned by your API key (PARTNER_ACCOUNT_NOT_FOUND).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

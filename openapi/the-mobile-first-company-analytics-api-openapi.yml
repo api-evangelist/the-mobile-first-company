@@ -1,0 +1,510 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Analytics
+  description: Pre-computed call metrics, team performance, and outbound dial funnel
+paths:
+  /v2/api/analytics/overview:
+    post:
+      summary: Team metrics
+      description: Returns team-wide KPIs with period-over-period comparison and a per-user breakdown. Covers all calls (inbound + outbound).
+      operationId: getTeamMetrics
+      tags:
+      - Analytics
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsBaseRequest'
+            example:
+              date:
+                from: '2026-03-25'
+                to: '2026-04-21'
+              compare_date:
+                from: '2026-02-25'
+                to: '2026-03-24'
+              user_ids:
+              - usr-abc123
+              - usr-def456
+      responses:
+        '200':
+          description: Team summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      date:
+                        $ref: '#/components/schemas/AnalyticsDateRange'
+                      compare_date:
+                        $ref: '#/components/schemas/AnalyticsDateRange'
+                      summary:
+                        type: object
+                        properties:
+                          total_calls:
+                            $ref: '#/components/schemas/MetricValue'
+                          talk_time_seconds:
+                            $ref: '#/components/schemas/MetricValue'
+                          calls_over_1_min:
+                            $ref: '#/components/schemas/MetricValue'
+                          answer_rate:
+                            $ref: '#/components/schemas/MetricValue'
+                      breakdown:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserBreakdown'
+                      last_updated:
+                        type: string
+                        format: date-time
+                        description: When the metrics were last updated
+              example:
+                data:
+                  date:
+                    from: '2026-03-25'
+                    to: '2026-04-21'
+                  compare_date:
+                    from: '2026-02-25'
+                    to: '2026-03-24'
+                  summary:
+                    total_calls:
+                      value: 2899
+                      previous: 2512
+                      change: 0.15
+                    talk_time_seconds:
+                      value: 81720
+                      previous: 103380
+                      change: -0.21
+                    calls_over_1_min:
+                      value: 290
+                      previous: 310
+                      change: -0.06
+                    answer_rate:
+                      value: 0.503
+                      previous: 0.46
+                      change: 0.09
+                  breakdown:
+                  - user:
+                      id: usr-abc123
+                      name: Adrien Gaucher
+                      email: adrien@company.com
+                    calls:
+                      value: 673
+                      change: -0.05
+                    talk_time_seconds:
+                      value: 38460
+                      change: -0.11
+                    calls_over_1_min:
+                      value: 141
+                      change: -0.1
+                    answer_rate:
+                      value: 0.645
+                      change: -0.03
+                  last_updated: '2026-04-21T19:07:00Z'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/analytics/outbound:
+    post:
+      summary: Outbound metrics
+      description: 'Returns outbound call metrics: dial funnel (dials → connected → conversations → conversions), time series, heatmap, leaderboard, and time spent metrics.'
+      operationId: getAnalyticsOutbound
+      tags:
+      - Analytics
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundAnalyticsRequest'
+            example:
+              date:
+                from: '2026-03-25'
+                to: '2026-04-21'
+              compare_date:
+                from: '2026-02-25'
+                to: '2026-03-24'
+              tags:
+              - meeting_booked
+              granularity: DAY
+      responses:
+        '200':
+          description: Outbound analytics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      date:
+                        $ref: '#/components/schemas/AnalyticsDateRange'
+                      compare_date:
+                        $ref: '#/components/schemas/AnalyticsDateRange'
+                      funnel:
+                        type: object
+                        properties:
+                          dials:
+                            $ref: '#/components/schemas/FunnelStage'
+                          connected:
+                            $ref: '#/components/schemas/FunnelStage'
+                          conversations:
+                            $ref: '#/components/schemas/FunnelStage'
+                          conversions:
+                            $ref: '#/components/schemas/FunnelStage'
+                      time_series:
+                        type: object
+                        properties:
+                          dials:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TimeSeriesPoint'
+                          connected:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TimeSeriesPoint'
+                          connection_rate:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TimeSeriesPoint'
+                          conversions:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TimeSeriesPoint'
+                      heatmap:
+                        type: object
+                        properties:
+                          dials:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/HeatmapCell'
+                          connected:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/HeatmapCell'
+                          connection_rate:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/HeatmapCell'
+                      leaderboard:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            user:
+                              $ref: '#/components/schemas/UserRef'
+                            connected:
+                              type: integer
+                      time_spent:
+                        type: object
+                        properties:
+                          avg_ringing_time_seconds:
+                            $ref: '#/components/schemas/MetricValue'
+                          avg_conversation_time_seconds:
+                            $ref: '#/components/schemas/MetricValue'
+                          total_conversation_time_seconds:
+                            $ref: '#/components/schemas/MetricValue'
+                      last_updated:
+                        type: string
+                        format: date-time
+                        description: When the metrics were last updated
+                      items:
+                        type: object
+                        nullable: true
+                        description: Drilldown call list. Only present when extend=items is set.
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OutboundDrilldownItem'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    AnalyticsBaseRequest:
+      type: object
+      required:
+      - date
+      properties:
+        date:
+          $ref: '#/components/schemas/AnalyticsDateRange'
+        compare_date:
+          $ref: '#/components/schemas/AnalyticsDateRange'
+          description: Comparison period. Metrics will include change vs this period.
+        user_ids:
+          type: array
+          items:
+            type: string
+          description: Filter by user IDs. Cannot be combined with allo_numbers.
+        allo_numbers:
+          type: array
+          items:
+            type: string
+          description: Filter by Allo numbers (E.164). Cannot be combined with user_ids.
+    OutboundDrilldownItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Call ID
+          example: cll-abc123
+        user:
+          $ref: '#/components/schemas/UserRef'
+        allo_number:
+          type: string
+          example: '+14155550100'
+        allo_number_label:
+          type: string
+          example: Sales US
+        contact_number:
+          type: string
+          example: '+14155551234'
+        stage:
+          type: string
+          enum:
+          - DIAL
+          - CONNECTED
+          - CONVERSATION
+          - CONVERSION
+        voicemail:
+          type: boolean
+        duration:
+          type: integer
+          description: Duration in seconds
+        date:
+          type: string
+          format: date-time
+    MetricValue:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Current period value
+        previous:
+          type: number
+          nullable: true
+          description: Previous period value
+        change:
+          type: number
+          nullable: true
+          description: Percentage change vs previous period (e.g. 0.15 = +15%)
+    FunnelStage:
+      type: object
+      properties:
+        count:
+          $ref: '#/components/schemas/MetricValue'
+        rate:
+          type: number
+          nullable: true
+          description: Percentage of total dials (e.g. 0.29 = 29%)
+    TimeSeriesPoint:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        value:
+          type: number
+    UserBreakdown:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserRef'
+        calls:
+          $ref: '#/components/schemas/MetricValue'
+        talk_time_seconds:
+          $ref: '#/components/schemas/MetricValue'
+        calls_over_1_min:
+          $ref: '#/components/schemas/MetricValue'
+        answer_rate:
+          $ref: '#/components/schemas/MetricValue'
+    OutboundAnalyticsRequest:
+      allOf:
+      - $ref: '#/components/schemas/AnalyticsBaseRequest'
+      - type: object
+        properties:
+          tags:
+            type: array
+            items:
+              type: string
+            description: Tag keys that define a conversion (e.g. ['meeting_booked', 'demo_scheduled'])
+          granularity:
+            type: string
+            enum:
+            - DAY
+            - WEEK
+            - MONTH
+            default: DAY
+            description: Time series granularity
+          extend:
+            type: string
+            enum:
+            - items
+            description: Include the list of outbound calls behind the funnel numbers. Requires `stage`.
+          stage:
+            type: string
+            enum:
+            - DIAL
+            - CONNECTED
+            - CONVERSATION
+            - CONVERSION
+            description: Filter drilldown items by funnel stage. Only used when `extend=items`.
+          page:
+            type: integer
+            default: 1
+            description: Page number for drilldown items. Only used when `extend=items`.
+          size:
+            type: integer
+            default: 20
+            maximum: 100
+            description: Page size for drilldown items. Only used when `extend=items`.
+    HeatmapCell:
+      type: object
+      properties:
+        day:
+          type: string
+          enum:
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          - SUNDAY
+        hour:
+          type: integer
+          description: Hour of day (0-23)
+        value:
+          type: integer
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    AnalyticsDateRange:
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date
+          description: Start date
+          example: '2026-03-25'
+        to:
+          type: string
+          format: date
+          description: End date
+          example: '2026-04-21'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

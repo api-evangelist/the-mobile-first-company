@@ -1,0 +1,869 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics Power Dialer API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: Power Dialer
+paths:
+  /v2/api/dialing-queues/current:
+    get:
+      summary: List current queue numbers
+      description: Returns the numbers in the Power Dialer queue currently assigned to the authenticated user, paginated and ordered by `position` ascending. `data` is the list of numbers (use `page`/`size` and read `pagination` to page through them); the `queue` key carries the queue's metadata (id, name, settings) without its numbers. To target a teammate's queue, pass either `user_id` or `email` as a query parameter (`user_id` wins when both are sent); the target must belong to the same team as the API key owner. When the user has no queue, the response is `200` with an empty `data` array, a zeroed `pagination`, and no `queue` (not a `404`).
+      operationId: getCurrentDialingQueue
+      tags:
+      - Power Dialer
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: user_id
+        in: query
+        required: false
+        description: ID of a teammate to read the queue for. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided.
+        schema:
+          type: string
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+      - name: email
+        in: query
+        required: false
+        description: Email of a teammate to read the queue for. Ignored when `user_id` is also supplied.
+        schema:
+          type: string
+          format: email
+          example: teammate@acme.com
+      - name: page
+        in: query
+        required: false
+        description: 1-indexed page number for the queue's `numbers`.
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+          example: 1
+      - name: size
+        in: query
+        required: false
+        description: Number of `numbers` per page (max 100).
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+          example: 20
+      responses:
+        '200':
+          description: A page of the current queue's numbers, ordered by position. Empty `data` array with zeroed `pagination` when the user has no queue.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/QueueNumber'
+                    queue:
+                      $ref: '#/components/schemas/DialingQueueMeta'
+                - $ref: '#/components/schemas/PaginatedResponse'
+              example:
+                data:
+                - number_to: '+12125550010'
+                  position: 0
+                  created_at: '2026-04-30T10:00:00'
+                  updated_at: '2026-04-30T10:00:00'
+                  call_start_date: null
+                  call_id: null
+                  routing_result: null
+                  sync_status: NOT_SYNCED
+                pagination:
+                  page: 1
+                  size: 20
+                  total_count: 137
+                  total_pages: 7
+                  has_more: true
+                queue:
+                  id: pdl_2xGh7kLmNpQr
+                  name: My Queue
+                  creator_id: usr_abc123
+                  assignee_id: usr_abc123
+                  voicemail_handling: NO_SKIP
+                  do_not_disturb: DISABLED
+                  created_at: '2026-04-30T10:00:00'
+                  updated_at: '2026-04-30T10:00:00'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          description: Assignee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                assignee_not_found:
+                  summary: user_id or email does not match a teammate
+                  value:
+                    error:
+                      type: not_found_error
+                      code: ASSIGNEE_NOT_FOUND
+                      message: No team member found for the provided 'user_id' or 'email'.
+                      retryable: false
+                      suggestion: List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    post:
+      summary: Reset current queue
+      description: Creates a fresh, empty queue assigned to the authenticated user. Any older queue with the same assignee stops being returned by `GET /current` (the newest queue wins). Send `user_id` or `email` to create the queue for a teammate instead — the API key owner is recorded as `creator_id`, the teammate as `assignee_id`. `user_id` wins when both are provided.
+      operationId: resetCurrentDialingQueue
+      tags:
+      - Power Dialer
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetDialingQueueRequest'
+            examples:
+              self:
+                summary: Reset your own queue
+                value:
+                  name: Monday cold calls
+              teammate_by_pid:
+                summary: Reset a teammate's queue by user_id
+                value:
+                  name: Monday cold calls
+                  user_id: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+              teammate_by_email:
+                summary: Reset a teammate's queue by email
+                value:
+                  name: Monday cold calls
+                  email: teammate@acme.com
+      responses:
+        '200':
+          description: The newly created (empty) queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DialingQueue'
+              example:
+                data:
+                  id: pdl_2xGh7kLmNpQr
+                  name: Monday cold calls
+                  creator_id: usr_abc123
+                  assignee_id: usr_abc123
+                  voicemail_handling: NO_SKIP
+                  do_not_disturb: DISABLED
+                  numbers: []
+                  created_at: '2026-05-06T10:00:00'
+                  updated_at: '2026-05-06T10:00:00'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          description: Authenticated user or assignee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                user_not_found:
+                  summary: Authenticated user not found
+                  value:
+                    error:
+                      type: not_found_error
+                      code: USER_NOT_FOUND
+                      message: User not found.
+                      retryable: false
+                assignee_not_found:
+                  summary: user_id or email does not match a teammate
+                  value:
+                    error:
+                      type: not_found_error
+                      code: ASSIGNEE_NOT_FOUND
+                      message: No team member found for the provided 'user_id' or 'email'.
+                      retryable: false
+                      suggestion: List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    patch:
+      summary: Upsert current queue
+      description: Creates or updates the config of the queue assigned to the authenticated user. Send `user_id` or `email` to act on a teammate's queue instead — `user_id` wins when both are provided.
+      operationId: upsertCurrentDialingQueue
+      tags:
+      - Power Dialer
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertDialingQueueRequest'
+            examples:
+              self:
+                summary: Update your own queue
+                value:
+                  name: Cold Calls
+              teammate_by_pid:
+                summary: Update a teammate's queue by user_id
+                value:
+                  name: Cold Calls
+                  user_id: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+      responses:
+        '200':
+          description: Updated queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DialingQueue'
+        '400':
+          $ref: '#/components/responses/ApiValidationError'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          description: Assignee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                error:
+                  type: not_found_error
+                  code: ASSIGNEE_NOT_FOUND
+                  message: No team member found for the provided 'user_id' or 'email'.
+                  retryable: false
+                  suggestion: List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/dialing-queues/current/numbers:
+    post:
+      summary: Append numbers to queue
+      description: Appends phone numbers to the Power Dialer queue assigned to the authenticated user. Creates the queue implicitly if none exists. Send `user_id` or `email` to append to a teammate's queue — if that teammate has no current queue, one is created with the API key owner as `creator_id` and the teammate as `assignee_id`. `user_id` wins when both are provided.
+      operationId: appendDialingQueueNumbers
+      tags:
+      - Power Dialer
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppendQueueNumbersRequest'
+            examples:
+              self:
+                summary: Append to your own queue
+                value:
+                  numbers:
+                  - number: +1 (212) 555-0010
+                    name: John
+                    last_name: Doe
+                    company: Acme Inc
+                    job_title: Sales Manager
+                    emails:
+                    - john.doe@acme.com
+                    website: https://acme.com
+                  - number: +33 6 12 34 56 78
+                    name: Marie
+                    last_name: Dupont
+                    company: Acme Inc
+                  - number: +44 20 7946 0958
+              teammate_by_pid:
+                summary: Append to a teammate's queue by user_id
+                value:
+                  user_id: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+                  numbers:
+                  - number: '+12125550010'
+                    name: John
+                    last_name: Doe
+              teammate_by_email:
+                summary: Append to a teammate's queue by email
+                value:
+                  email: teammate@acme.com
+                  numbers:
+                  - number: '+12125550010'
+                    name: John
+                    last_name: Doe
+      responses:
+        '200':
+          description: Numbers appended
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AppendQueueNumbersResponse'
+              example:
+                data:
+                  added:
+                  - number_to: '+12125550010'
+                    position: 0
+                    created_at: '2026-04-30T10:00:00'
+                    updated_at: '2026-04-30T10:00:00'
+                  - number_to: '+33612345678'
+                    position: 1
+                    created_at: '2026-04-30T10:00:00'
+                    updated_at: '2026-04-30T10:00:00'
+                  skipped: []
+        '400':
+          description: Queue limit reached or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                error:
+                  type: validation_error
+                  code: DIALING_QUEUE_LIMIT_REACHED
+                  message: The dialing queue cannot exceed 1,000 numbers.
+                  retryable: false
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          description: Assignee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                error:
+                  type: not_found_error
+                  code: ASSIGNEE_NOT_FOUND
+                  message: No team member found for the provided 'user_id' or 'email'.
+                  retryable: false
+                  suggestion: List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.
+        '409':
+          description: Concurrent append conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                error:
+                  type: conflict_error
+                  code: DIALING_QUEUE_APPEND_CONFLICT
+                  message: A concurrent append to this queue caused a position conflict.
+                  retryable: false
+                  suggestion: Retry the request — the conflict resolves on the next attempt.
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    delete:
+      summary: Clear queue numbers
+      description: 'Removes numbers from the queue assigned to the authenticated user. Exactly one filter must be supplied via query string: `number` (E.164), `position` (0-based index), `number` + `position` together (delete a specific occurrence of a duplicate), or `unassigned=true` (remove every entry that has not been called yet). Combining `unassigned` with `number` or `position` is rejected. Pass `user_id` or `email` to clear a teammate''s queue instead — `user_id` wins when both are provided.'
+      operationId: clearDialingQueueNumbers
+      tags:
+      - Power Dialer
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: number
+        in: query
+        required: false
+        description: Phone number to remove (any format — normalized to E.164). Removes every entry matching this number unless `position` is also supplied.
+        schema:
+          type: string
+          example: '+12125550010'
+      - name: position
+        in: query
+        required: false
+        description: 0-based position to remove. Combine with `number` to disambiguate when the same number appears more than once.
+        schema:
+          type: integer
+          minimum: 0
+          example: 3
+      - name: unassigned
+        in: query
+        required: false
+        description: When `true`, removes every queue entry that has not been called yet. Cannot be combined with `number` or `position`.
+        schema:
+          type: boolean
+          example: true
+      - name: user_id
+        in: query
+        required: false
+        description: ID of a teammate whose queue to clear. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided.
+        schema:
+          type: string
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+      - name: email
+        in: query
+        required: false
+        description: Email of a teammate whose queue to clear. Ignored when `user_id` is also supplied.
+        schema:
+          type: string
+          format: email
+          example: teammate@acme.com
+      responses:
+        '200':
+          description: Numbers removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ClearQueueNumbersResponse'
+              example:
+                data:
+                  removed: 4
+        '400':
+          description: Filter missing or conflicting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                filter_required:
+                  summary: No filter supplied
+                  value:
+                    error:
+                      type: validation_error
+                      code: DIALING_QUEUE_DELETE_FILTER_REQUIRED
+                      message: Provide at least one of 'number', 'position', or 'unassigned=true' to clear queue numbers.
+                      retryable: false
+                      suggestion: Add 'number', 'position', or 'unassigned=true' as a query parameter.
+                filter_conflict:
+                  summary: unassigned combined with number/position
+                  value:
+                    error:
+                      type: validation_error
+                      code: DIALING_QUEUE_DELETE_FILTER_CONFLICT
+                      message: '''unassigned=true'' cannot be combined with ''number'' or ''position''.'
+                      retryable: false
+                      suggestion: Use 'unassigned=true' alone, or remove it and rely on 'number'/'position'.
+                invalid_phone_number:
+                  summary: number is not a valid E.164 number
+                  value:
+                    error:
+                      type: validation_error
+                      code: INVALID_PHONE_NUMBER
+                      message: The phone number '+1212' is not a valid E.164 number.
+                      retryable: false
+                      param: number
+                      suggestion: Provide a valid E.164 phone number (e.g., +33612345678).
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          description: Queue or position not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                queue_not_found:
+                  summary: User has no Power Dialer queue
+                  value:
+                    error:
+                      type: not_found_error
+                      code: DIALING_QUEUE_NOT_FOUND
+                      message: No dialing queue found for the authenticated user.
+                      retryable: false
+                      suggestion: Create a queue by appending numbers with POST /v2/api/dialing-queues/current/numbers.
+                position_not_found:
+                  summary: No entry at the requested position
+                  value:
+                    error:
+                      type: not_found_error
+                      code: QUEUE_NUMBER_POSITION_NOT_FOUND
+                      message: No queue number found at position 7.
+                      retryable: false
+                      param: position
+                      suggestion: Fetch the current queue with GET /v2/api/dialing-queues/current to see existing positions.
+                assignee_not_found:
+                  summary: user_id or email does not match a teammate
+                  value:
+                    error:
+                      type: not_found_error
+                      code: ASSIGNEE_NOT_FOUND
+                      message: No team member found for the provided 'user_id' or 'email'.
+                      retryable: false
+                      suggestion: List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  responses:
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    ClearQueueNumbersResponse:
+      type: object
+      description: Result of clearing numbers from a Power Dialer queue.
+      properties:
+        removed:
+          type: integer
+          description: Number of queue entries that were removed.
+          example: 4
+    UpsertDialingQueueRequest:
+      type: object
+      description: Creates or updates the queue config. All fields are optional — only the fields you supply are touched. Pass `user_id` or `email` to act on a teammate's queue instead.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: New queue name (1–255 characters)
+          minLength: 1
+          maxLength: 255
+        voicemail_handling:
+          type: string
+          nullable: true
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call hits voicemail.
+        do_not_disturb:
+          type: string
+          nullable: true
+          enum:
+          - ENABLED
+          - DISABLED
+          description: Silence inbound calls while running the queue.
+        user_id:
+          type: string
+          nullable: true
+          description: Optional. ID of a teammate whose queue config should be updated. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Optional. Email of a teammate whose queue config should be updated. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    AppendQueueNumbersResponse:
+      type: object
+      properties:
+        added:
+          type: array
+          description: Numbers that were successfully appended
+          items:
+            $ref: '#/components/schemas/QueueNumber'
+        skipped:
+          type: array
+          description: Numbers that were skipped (e.g. invalid format)
+          items:
+            type: object
+            properties:
+              number:
+                type: string
+                description: The raw input number that was skipped
+              reason:
+                type: string
+                enum:
+                - INVALID_PHONE_NUMBER
+                description: Why the number was skipped
+    QueueNumber:
+      type: object
+      description: A phone number entry in a Power Dialer queue
+      properties:
+        number_to:
+          type: string
+          description: E.164 destination phone number
+        position:
+          type: integer
+          description: Order within the queue (0-based)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        call_start_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the user started calling this entry. `null` if the entry is still unassigned.
+        call_id:
+          type: string
+          nullable: true
+          description: ID of the call placed for this entry (`cll-*`). `null` until a call is placed.
+        routing_result:
+          type: string
+          nullable: true
+          enum:
+          - FAILED
+          - RECEIVED
+          - BLOCKED
+          - ANSWERED
+          - TRANSFERRED_BLAND
+          - TRANSFERRED_ELEVEN_LABS
+          - TRANSFERRED_EXTERNAL
+          - FAILED_EXTERNAL
+          - VOICEMAIL
+          - CLOSED
+          description: Final routing outcome of the call placed for this entry.
+        sync_status:
+          type: string
+          enum:
+          - NOT_SYNCED
+          - PROCESSING
+          - SYNCED
+          description: State of contact creation/sync for this entry.
+        detected_outbound_voicemail:
+          type: boolean
+          nullable: true
+          description: Whether the call was detected as having reached a voicemail box.
+        not_reached_destination_reason:
+          type: string
+          nullable: true
+          enum:
+          - BUSY
+          - CALLEE_TEMPORARILY_UNAVAILABLE
+          - RING_TIMEOUT
+          - NOT_IN_SERVICE
+          - DECLINED
+          - NETWORK_ERROR
+          description: Why the call did not reach the contact (only set when applicable).
+        voicemail_left:
+          type: boolean
+          nullable: true
+          description: Whether the user left a voicemail on this entry.
+    PaginatedResponse:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    AppendQueueNumbersRequest:
+      type: object
+      required:
+      - numbers
+      properties:
+        numbers:
+          type: array
+          description: Numbers to append to the queue. Each entry requires a phone number; contact metadata is optional.
+          minItems: 1
+          items:
+            type: object
+            required:
+            - number
+            properties:
+              number:
+                type: string
+                description: Phone number in any format — will be normalized to E.164
+              name:
+                type: string
+                nullable: true
+                description: First name (optional — used to create or match a contact)
+              last_name:
+                type: string
+                nullable: true
+                description: Last name
+              company:
+                type: string
+                nullable: true
+                description: Company name — matched by name within the team (case-insensitive). If no matching company exists, one is created automatically.
+              website:
+                type: string
+                nullable: true
+                description: Website URL
+              job_title:
+                type: string
+                nullable: true
+                description: Job title
+              emails:
+                type: array
+                nullable: true
+                items:
+                  type: string
+                description: Email addresses
+              addresses:
+                type: array
+                nullable: true
+                items:
+                  type: string
+                description: Physical addresses
+        user_id:
+          type: string
+          nullable: true
+          description: Optional. ID of a teammate whose queue should receive the numbers. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users).
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Optional. Email of a teammate whose queue should receive the numbers. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+    ResetDialingQueueRequest:
+      type: object
+      description: Optional payload for resetting a queue. Send an empty body to reset your own queue without renaming.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Display name for the new queue (max 255 characters). Leave unset to create the queue without a name.
+          maxLength: 255
+        user_id:
+          type: string
+          nullable: true
+          description: Optional. ID of a teammate the new queue should be assigned to. The API key owner is recorded as `creator_id`. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Optional. Email of a teammate the new queue should be assigned to. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    DialingQueue:
+      type: object
+      description: A user's Power Dialer queue with its configuration and numbers.
+      properties:
+        id:
+          type: string
+          description: Unique queue identifier (KSUID with `pdl` prefix)
+        name:
+          type: string
+          nullable: true
+          description: Display name of the queue
+        creator_id:
+          type: string
+          description: User ID of the queue creator — the user (or API key owner) that created the queue.
+        assignee_id:
+          type: string
+          nullable: true
+          description: User ID of the user expected to run the queue. `GET /current` returns the queue where this matches the authenticated user (or the user resolved from `user_id` / `email`). Defaults to the creator when none was specified at creation time.
+        voicemail_handling:
+          type: string
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call lands in voicemail. `SKIP` advances to the next number; `NO_SKIP` keeps the user on the call.
+        do_not_disturb:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
+        numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueueNumber'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    DialingQueueMeta:
+      type: object
+      description: Power Dialer queue metadata, without its numbers. Returned under the `queue` key of `GET /current`; the numbers themselves are the paginated `data`.
+      properties:
+        id:
+          type: string
+          description: Unique queue identifier (KSUID with `pdl` prefix)
+        name:
+          type: string
+          nullable: true
+          description: Display name of the queue
+        creator_id:
+          type: string
+          description: User ID of the queue creator.
+        assignee_id:
+          type: string
+          nullable: true
+          description: User ID of the user expected to run the queue.
+        voicemail_handling:
+          type: string
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call lands in voicemail.
+        do_not_disturb:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

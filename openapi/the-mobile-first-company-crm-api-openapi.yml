@@ -1,0 +1,1107 @@
+openapi: 3.0.3
+info:
+  title: Allo Analytics CRM API
+  description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
+
+
+    All requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.'
+  version: 1.0.0
+  contact:
+    name: Allo Support
+servers:
+- url: https://api.withallo.com
+  description: Production server
+tags:
+- name: CRM
+  description: Manage people, companies, and deals in your CRM.
+paths:
+  /v2/api/crm/people:
+    post:
+      summary: Create person
+      description: Creates a new person in your CRM.
+      operationId: createPerson
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePersonRequest'
+            example:
+              name: John
+              last_name: Doe
+              job_title: CEO
+              website: https://example.com
+              address: 123 Main St
+              numbers:
+              - '+33612345678'
+              emails:
+              - john@example.com
+              company_id: com-xyz789
+      responses:
+        '200':
+          description: Person created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmPerson'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '409':
+          $ref: '#/components/responses/ApiConflict'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/people/{id}:
+    get:
+      summary: Get person
+      description: Returns a single person by ID.
+      operationId: getPerson
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Person ID (e.g., "per-abc123")
+        schema:
+          type: string
+          example: per-abc123
+      responses:
+        '200':
+          description: Person details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmPerson'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    put:
+      summary: Update person
+      description: Updates an existing person. Only provided fields will be updated.
+      operationId: updatePerson
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Person ID (e.g., "per-abc123")
+        schema:
+          type: string
+          example: per-abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePersonRequest'
+            example:
+              job_title: CTO
+      responses:
+        '200':
+          description: Person updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmPerson'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/people/search:
+    post:
+      summary: Search people
+      description: Search and filter people in your CRM with advanced filtering, sorting, and pagination.
+      operationId: searchPeople
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPeopleRequest'
+            example:
+              filters:
+                job_title: engineer
+                company: Acme
+              sort: NAME_ASC
+              page: 1
+              size: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CrmPerson'
+                - $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/companies:
+    post:
+      summary: Create company
+      description: Creates a new company in your CRM.
+      operationId: createCompany
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+            example:
+              name: Acme Corp
+              website: https://acme.com
+              industry: Technology
+      responses:
+        '201':
+          description: Company created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmCompany'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/companies/{id}:
+    get:
+      summary: Get company
+      description: Returns a single company by ID.
+      operationId: getCompany
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Company ID (e.g., "com-xyz789")
+        schema:
+          type: string
+          example: com-xyz789
+      responses:
+        '200':
+          description: Company details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmCompany'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    put:
+      summary: Update company
+      description: Updates an existing company. Only provided fields will be updated.
+      operationId: updateCompany
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Company ID (e.g., "com-xyz789")
+        schema:
+          type: string
+          example: com-xyz789
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyRequest'
+            example:
+              industry: SaaS
+      responses:
+        '200':
+          description: Company updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmCompany'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/companies/search:
+    post:
+      summary: Search companies
+      description: Search and filter companies in your CRM.
+      operationId: searchCompanies
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCompaniesRequest'
+            example:
+              filters:
+                name: Acme
+                industry: Technology
+              sort: NAME_ASC
+              page: 1
+              size: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CrmCompany'
+                - $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/deals:
+    post:
+      summary: Create deal
+      description: Creates a new deal in your CRM.
+      operationId: createDeal
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealRequest'
+            example:
+              name: Enterprise Plan
+              status: negotiation
+              amount: 50000
+              currency: USD
+              company_id: com-xyz789
+      responses:
+        '201':
+          description: Deal created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmDeal'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/deals/{id}:
+    get:
+      summary: Get deal
+      description: Returns a single deal by ID.
+      operationId: getDeal
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Deal ID (e.g., "dea-def456")
+        schema:
+          type: string
+          example: dea-def456
+      responses:
+        '200':
+          description: Deal details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmDeal'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    patch:
+      summary: Update deal
+      description: Updates an existing deal. Only provided fields will be updated.
+      operationId: updateDeal
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Deal ID (e.g., "dea-def456")
+        schema:
+          type: string
+          example: dea-def456
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDealRequest'
+            example:
+              status: won
+              closed_at: '2026-04-28T12:00:00'
+      responses:
+        '200':
+          description: Deal updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CrmDeal'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+    delete:
+      summary: Delete deal
+      description: Deletes a deal from your CRM.
+      operationId: deleteDeal
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Deal ID (e.g., "dea-def456")
+        schema:
+          type: string
+          example: dea-def456
+      responses:
+        '204':
+          description: Deal deleted
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '404':
+          $ref: '#/components/responses/ApiNotFound'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+  /v2/api/crm/deals/search:
+    post:
+      summary: Search deals
+      description: Search and filter deals in your CRM.
+      operationId: searchDeals
+      tags:
+      - CRM
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchDealsRequest'
+            example:
+              search: Enterprise
+              page: 1
+              size: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CrmDeal'
+                - $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          $ref: '#/components/responses/ApiUnauthorized'
+        '422':
+          $ref: '#/components/responses/ApiValidationError'
+        '429':
+          $ref: '#/components/responses/ApiRateLimited'
+components:
+  schemas:
+    CrmCompany:
+      type: object
+      description: A company in the CRM
+      properties:
+        id:
+          type: string
+          description: Unique company identifier
+          example: com-xyz789
+        name:
+          type: string
+          description: Company name
+          example: Acme Corp
+        website:
+          type: string
+          nullable: true
+          description: Company website URL
+          example: https://acme.com
+        industry:
+          type: string
+          nullable: true
+          description: Industry sector
+          example: Technology
+        person_count:
+          type: integer
+          description: Number of people linked to this company
+          example: 3
+        interactions:
+          type: integer
+          description: Total number of interactions across all people in this company
+          example: 12
+        last_activity_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of the last activity
+          example: '2026-04-28T10:30:00'
+        created_at:
+          type: string
+          format: date-time
+          description: When the company was created
+          example: '2026-04-01T09:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the company was last updated
+          example: '2026-04-28T10:30:00'
+    UpdateCompanyRequest:
+      type: object
+      description: Request body for updating a company. Only provided fields will be updated.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Company name
+        website:
+          type: string
+          nullable: true
+          description: Company website URL
+        industry:
+          type: string
+          nullable: true
+          description: Industry sector
+    CreateCompanyRequest:
+      type: object
+      description: Request body for creating a company
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Company name
+          example: Acme Corp
+        website:
+          type: string
+          nullable: true
+          description: Company website URL
+          example: https://acme.com
+        industry:
+          type: string
+          nullable: true
+          description: Industry sector
+          example: Technology
+    UpdateDealRequest:
+      type: object
+      description: Request body for updating a deal. Only provided fields will be updated.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Deal name
+        status:
+          type: string
+          nullable: true
+          description: Deal status
+        amount:
+          type: number
+          nullable: true
+          description: Deal monetary value
+        currency:
+          type: string
+          nullable: true
+          description: Three-letter ISO 4217 currency code
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type: string
+          nullable: true
+          description: When the deal was closed (ISO 8601)
+        company_id:
+          type: string
+          nullable: true
+          description: ID of the company to associate with
+    CrmCompanyRef:
+      type: object
+      nullable: true
+      description: Embedded company reference
+      properties:
+        id:
+          type: string
+          description: Company ID
+          example: com-xyz789
+        name:
+          type: string
+          description: Company name
+          example: Acme Corp
+    SearchPeopleRequest:
+      type: object
+      description: Request body for searching people
+      properties:
+        filters:
+          type: object
+          nullable: true
+          description: Named filters. All are combined with AND.
+          properties:
+            name:
+              type: string
+              description: Filter by first name (contains)
+            last_name:
+              type: string
+              description: Filter by last name (contains)
+            job_title:
+              type: string
+              description: Filter by job title (contains)
+            website:
+              type: string
+              description: Filter by website (contains)
+            company:
+              type: string
+              description: Filter by company name (contains)
+            phone_number:
+              type: string
+              description: Filter by phone number (exact match)
+            email:
+              type: string
+              description: Filter by email (contains)
+            deal_status:
+              type: string
+              description: Filter by deal status (exact match)
+        search:
+          type: string
+          nullable: true
+          description: Free-text search across name, email, phone number, and company
+        sort:
+          type: string
+          nullable: true
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - NAME_ASC
+          - NAME_DESC
+          - CREATED_DESC
+          - CREATED_ASC
+          description: 'Sort order (default: DATE_DESC)'
+        page:
+          type: integer
+          default: 1
+          description: Page number (1-indexed)
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+          description: Results per page
+    PaginatedResponse:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    SearchDealsRequest:
+      type: object
+      description: Request body for searching deals
+      properties:
+        filters:
+          type: object
+          nullable: true
+          description: Named filters. Combined with AND.
+          properties:
+            stage:
+              type: string
+              description: Filter by deal stage/status (exact match)
+        search:
+          type: string
+          nullable: true
+          description: Free-text search across deal name and company
+        sort:
+          type: string
+          nullable: true
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - NAME_ASC
+          - NAME_DESC
+          - CREATED_DESC
+          - CREATED_ASC
+          description: 'Sort order (default: DATE_DESC)'
+        page:
+          type: integer
+          default: 1
+          description: Page number (1-indexed)
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+          description: Results per page
+    SearchCompaniesRequest:
+      type: object
+      description: Request body for searching companies
+      properties:
+        filters:
+          type: object
+          nullable: true
+          description: Named filters. All are combined with AND.
+          properties:
+            name:
+              type: string
+              description: Filter by company name (contains)
+            website:
+              type: string
+              description: Filter by website (contains)
+            industry:
+              type: string
+              description: Filter by industry (contains)
+        sort:
+          type: string
+          nullable: true
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - NAME_ASC
+          - NAME_DESC
+          - CREATED_DESC
+          - CREATED_ASC
+          description: 'Sort order (default: DATE_DESC)'
+        page:
+          type: integer
+          default: 1
+          description: Page number (1-indexed)
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+          description: Results per page
+    CrmPerson:
+      type: object
+      description: A person in the CRM
+      properties:
+        id:
+          type: string
+          description: Unique person identifier
+          example: per-abc123
+        name:
+          type: string
+          nullable: true
+          description: First name
+          example: John
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+          example: Doe
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+          example: CEO
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+          example: https://example.com
+        address:
+          type: string
+          nullable: true
+          description: Postal address
+          example: 123 Main St
+        numbers:
+          type: array
+          items:
+            type: string
+          description: Phone numbers in E.164 format
+          example:
+          - '+33612345678'
+        emails:
+          type: array
+          items:
+            type: string
+          description: Email addresses
+          example:
+          - john@example.com
+        company:
+          $ref: '#/components/schemas/CrmCompanyRef'
+        interactions:
+          type: integer
+          description: Total number of interactions (calls + messages)
+          example: 5
+        last_activity_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of the last activity
+          example: '2026-04-28T10:30:00'
+        created_at:
+          type: string
+          format: date-time
+          description: When the person was created
+          example: '2026-04-01T09:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the person was last updated
+          example: '2026-04-28T10:30:00'
+    CreateDealRequest:
+      type: object
+      description: Request body for creating a deal
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Deal name
+          example: Enterprise Plan
+        status:
+          type: string
+          nullable: true
+          description: Deal status
+          example: negotiation
+        amount:
+          type: number
+          nullable: true
+          description: Deal monetary value
+          example: 50000
+        currency:
+          type: string
+          nullable: true
+          description: Three-letter ISO 4217 currency code
+          example: USD
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type: string
+          nullable: true
+          description: When the deal was closed (ISO 8601)
+          example: '2026-04-28T12:00:00'
+        company_id:
+          type: string
+          nullable: true
+          description: ID of the company to associate with
+          example: com-xyz789
+    CrmDeal:
+      type: object
+      description: A deal in the CRM
+      properties:
+        id:
+          type: string
+          description: Unique deal identifier
+          example: dea-def456
+        name:
+          type: string
+          description: Deal name
+          example: Enterprise Plan
+        status:
+          type: string
+          nullable: true
+          description: Current deal status
+          example: negotiation
+        amount:
+          type: number
+          nullable: true
+          description: Deal monetary value
+          example: 50000
+        currency:
+          type: string
+          nullable: true
+          description: Three-letter ISO 4217 currency code
+          example: USD
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the deal was closed (ISO 8601)
+          example: null
+        company:
+          $ref: '#/components/schemas/CrmCompanyRef'
+        created_at:
+          type: string
+          format: date-time
+          description: When the deal was created
+          example: '2026-04-15T14:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the deal was last updated
+          example: '2026-04-28T10:30:00'
+    UpdatePersonRequest:
+      type: object
+      description: Request body for updating a person. Only provided fields will be updated.
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: First name
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+        address:
+          type: string
+          nullable: true
+          description: Postal address
+        numbers:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Phone numbers (replaces all existing numbers)
+        emails:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Email addresses (replaces all existing emails)
+        company_id:
+          type: string
+          nullable: true
+          description: ID of the company to associate with
+    CreatePersonRequest:
+      type: object
+      description: Request body for creating a person
+      required:
+      - numbers
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: First name
+          example: John
+        last_name:
+          type: string
+          nullable: true
+          description: Last name
+          example: Doe
+        job_title:
+          type: string
+          nullable: true
+          description: Job title
+          example: CEO
+        website:
+          type: string
+          nullable: true
+          description: Website URL
+          example: https://example.com
+        address:
+          type: string
+          nullable: true
+          description: Postal address
+          example: 123 Main St
+        numbers:
+          type: array
+          items:
+            type: string
+          description: Phone numbers in E.164 format. At least one number is required.
+          minItems: 1
+          example:
+          - '+33612345678'
+        emails:
+          type: array
+          nullable: true
+          items:
+            type: string
+          description: Email addresses
+          example:
+          - john@example.com
+        company_id:
+          type: string
+          nullable: true
+          description: ID of the company to associate with
+          example: com-xyz789
+        allow_duplicate_number:
+          type: boolean
+          description: When true, allows creating a person even if the phone numbers are already assigned to another person. Defaults to false.
+          default: false
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type: integer
+              nullable: true
+  responses:
+    ApiConflict:
+      description: Conflict with existing resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  securitySchemes:
+    CallsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONVERSATIONS_READ`'
+    ContactsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ`'
+    ContactsWriteAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `CONTACTS_READ_WRITE`'
+    SmsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Scope needed: `SMS_SEND`'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
