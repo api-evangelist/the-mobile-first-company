@@ -1,0 +1,88 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  Allo API guides (authentication, error-handling, rate-limits, pagination) +
+  openapi/the-mobile-first-company-allo-openapi.json
+docs: https://help.withallo.com/en/v2/api-reference/introduction
+api: Allo API
+base_url: https://api.withallo.com
+media_type: application/json
+authentication:
+  style: api_key
+  header: Authorization
+  format: 'Api-Key ak_live_<key>'
+  also: oauth2 (see authentication/the-mobile-first-company-authentication.yml)
+  scopes_ref: scopes/the-mobile-first-company-scopes.yml
+idempotency:
+  supported: true
+  header: Idempotency-Key
+  applies_to: All write endpoints (POST, PUT, DELETE)
+  key_format: client-supplied unique value (e.g. a UUID)
+  retention: 1 hour after a successful (2xx) response
+  replay_behavior: >-
+    Re-sending the same key to the SAME endpoint returns the stored response
+    with an `Idempotency-Replayed: true` header without re-executing the
+    operation.
+  failure_behavior: >-
+    On a 4xx/5xx the key is NOT consumed and may be retried with the same key
+    until the request succeeds.
+  reuse_conflict: Reusing a key for a different endpoint/method returns 409 IDEMPOTENCY_KEY_REUSE.
+  response_headers:
+  - Idempotency-Key
+  - Idempotency-Replayed
+pagination:
+  style: page-number
+  params:
+    page: {default: 1, note: 1-indexed}
+    size: {default: 20, max: 100}
+  location: query params for GET; request body for POST search endpoints
+  response_object: pagination
+  response_fields:
+  - page
+  - size
+  - total_count
+  - total_pages
+  - has_more
+  data_field: data
+request_id:
+  response_field: request_id
+  format: 'req_ + 12 alphanumeric characters'
+  client_override_header: X-Request-Id
+  note: Send X-Request-Id to have the API echo your id instead of generating one.
+rate_limiting:
+  style: per-second, per-API-key
+  read_limit: 20 requests/second (GET)
+  write_limit: 5 requests/second (POST/PUT/PATCH/DELETE)
+  response_headers:
+  - X-RateLimit-Limit
+  - X-RateLimit-Remaining
+  - X-RateLimit-Reset
+  exceeded:
+    status: 429
+    code: RATE_LIMIT_EXCEEDED
+    retry_signal: Retry-After header + error.retry_after_seconds
+  ref: lifecycle/the-mobile-first-company-lifecycle.yml
+error_envelope:
+  root: error
+  format: custom JSON (NOT RFC 9457 problem+json)
+  key_fields: [type, code, message, retryable, request_id, doc_url, param, suggestion, errors, retry_after_seconds]
+  ref: errors/the-mobile-first-company-problem-types.yml
+versioning:
+  style: URI path
+  versions:
+  - v1 (/v1/api/**)
+  - v2 (/v2/api/**)
+  note: >-
+    Error `code` values are stable contracts and will not change without an API
+    version bump. Newer endpoints live under /v2/api.
+  ref: lifecycle/the-mobile-first-company-lifecycle.yml
+identifiers:
+  style: prefixed opaque ids
+  examples:
+    call: 'cll- / cll_'
+    message: 'msg- / msg_'
+  ref: data-model/the-mobile-first-company-data-model.yml
+formats:
+  phone_numbers: E.164 (e.g. +14155551234)
+webhooks:
+  ref: asyncapi/the-mobile-first-company-webhooks.yml

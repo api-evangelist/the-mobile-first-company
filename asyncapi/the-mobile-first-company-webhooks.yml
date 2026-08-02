@@ -1,0 +1,61 @@
+generated: '2026-07-21'
+method: searched
+type: Webhooks
+docs: https://help.withallo.com/en/integrations/webhooks
+source: >-
+  https://help.withallo.com/en/integrations/webhooks +
+  https://help.withallo.com/en/v2/api-reference/webhooks/verifying-signatures +
+  openapi/the-mobile-first-company-allo-openapi.json (webhooks management endpoints)
+api: Allo API
+note: >-
+  Allo documents a webhook (outbound HTTP callback) surface but does not publish
+  an AsyncAPI document. Captured here as a webhook catalog. Webhook endpoints are
+  managed via the REST API (listWebhooks / createWebhook / updateWebhook /
+  deleteWebhook / getWebhook / listWebhookEventTypes) with the
+  WEBHOOKS_READ_WRITE scope.
+management_endpoints:
+- GET /v2/api/webhooks
+- POST /v2/api/webhooks
+- GET /v2/api/webhooks/{webhook_id}
+- PUT /v2/api/webhooks/{webhook_id}
+- DELETE /v2/api/webhooks/{webhook_id}
+- GET /v2/api/webhooks/event_types
+delivery:
+  transport: HTTPS POST to subscriber URL
+  ack: Return 200 within 20 seconds
+  guarantee: at-least-once (deduplicate on the webhook-id header)
+  retries: up to 8 attempts over ~27.5 hours with exponential backoff
+  auto_disable: endpoint disabled after continuous failure for 5 days
+  recovery: missed events can be replayed after fixing the endpoint (bulk recovery)
+security:
+  signature_header: webhook-signature
+  id_header: webhook-id
+  note: >-
+    Every delivery carries a cryptographic signature; verify against the raw
+    request body using the endpoint's signing secret. Subscriber URLs must be
+    HTTPS.
+envelope:
+  fields: [topic, version, timestamp, data]
+  version: '2.0'
+  example_topic: call.completed
+events:
+- topic: call.received
+  description: Inbound call starts ringing.
+- topic: call.triggered
+  description: Outbound call initiated.
+- topic: call.answered
+  description: Call answered on the other side.
+- topic: call.completed
+  description: Call finished with recording, transcript, and summary.
+- topic: tag.added
+  description: Tag added to a call.
+- topic: tag.removed
+  description: Tag removed from a call.
+- topic: sms.received
+  description: Inbound SMS received.
+- topic: sms.sent
+  description: Outbound SMS sent.
+- topic: contact.created
+  description: Contact created.
+- topic: contact.updated
+  description: Contact updated.

@@ -1,0 +1,18 @@
+generated: '2026-07-21'
+method: searched
+source: https://www.withallo.com/changelog
+docs: https://www.withallo.com/changelog
+api: Allo API
+scheme:
+  cadence: weekly
+  tagline: "Allo changelog: new features shipped every week"
+  hosted_on: withallo.com (Webflow) marketing changelog
+  format: dated narrative product-changelog (not a machine-readable API changelog)
+entries: []
+note: >-
+  Allo publishes a public, weekly product changelog at
+  https://www.withallo.com/changelog. The page is client-rendered, so individual
+  dated entries were not machine-extractable in this pass and are intentionally
+  left empty rather than fabricated. API version changes are additionally
+  signalled by the stable-error-code / URI-version-bump contract in
+  lifecycle/the-mobile-first-company-lifecycle.yml.

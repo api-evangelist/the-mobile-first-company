@@ -1,0 +1,17 @@
+generated: '2026-07-21'
+method: generated
+source: >-
+  Generated from real operationIds in
+  openapi/the-mobile-first-company-allo-openapi.json + Allo API guides. Grounded,
+  not fabricated — every operationId below exists in the spec.
+api: Allo API
+base_url: https://api.withallo.com
+skills:
+- name: sync-completed-calls-to-crm
+  file: the-mobile-first-company-sync-completed-calls-to-crm.md
+  description: Pull completed calls with transcripts and AI summaries and push them into your CRM/database.
+  operations: [listConversations, searchAllConversations, getConversationItem, batchGetConversationItems]
+- name: send-sms-follow-up
+  file: the-mobile-first-company-send-sms-follow-up.md
+  description: Send a follow-up SMS from an Allo number after a call, safely and idempotently.
+  operations: [getNumbers, listNumbers, sendSMS, addTags]

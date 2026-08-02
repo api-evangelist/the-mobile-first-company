@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://api.withallo.com",
+      "service-desc": [
+        {
+          "href": "https://help.withallo.com/openapi.json",
+          "type": "application/openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://help.withallo.com/en/api-reference/introduction",
+          "type": "text/html"
+        }
+      ],
+      "service-meta": [
+        {
+          "href": "https://help.withallo.com/llms.txt",
+          "type": "text/plain"
+        }
+      ]
+    }
+  ]
+}

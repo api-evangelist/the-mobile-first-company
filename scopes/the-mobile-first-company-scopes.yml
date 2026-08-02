@@ -1,0 +1,97 @@
+generated: '2026-07-21'
+method: searched
+docs: https://help.withallo.com/en/v2/api-reference/guides/authentication
+source: >-
+  https://api.withallo.com/.well-known/oauth-authorization-server (scopes_supported)
+  + Allo API-key scope reference (authentication guide) + partner endpoint scope
+  requirements in openapi/the-mobile-first-company-allo-openapi.json
+api: Allo API
+oauth:
+  issuer: https://api.withallo.com
+  authorization_endpoint: https://api.withallo.com/v1/oauth/authorize
+  token_endpoint: https://api.withallo.com/v1/oauth/token
+  revocation_endpoint: https://api.withallo.com/v1/oauth/revoke
+  grant_types_supported:
+  - authorization_code
+  - refresh_token
+  - client_credentials
+  code_challenge_methods_supported:
+  - S256
+  token_endpoint_auth_methods_supported:
+  - none
+  - client_secret_post
+note: >-
+  Scopes are attached to Allo API keys (created in Settings > API) and to OAuth
+  clients / the MCP server. The 19 scopes below are advertised verbatim in the
+  OAuth authorization-server metadata; WEBHOOKS_READ_WRITE, BILLING and PARTNER
+  are documented in the API-key scope reference / partner endpoints but are not
+  listed in scopes_supported.
+scopes:
+- name: CONVERSATIONS_READ
+  source: oauth-metadata
+  description: Read calls, SMS, and conversation history.
+- name: CONVERSATIONS_WRITE
+  source: oauth-metadata
+  description: Write / mutate conversation items (e.g. update summaries, mark read/archived).
+- name: CONTACTS_READ
+  source: oauth-metadata
+  description: Read contact information.
+- name: CONTACTS_READ_WRITE
+  source: oauth-metadata
+  description: Read and write contact information.
+- name: SMS_SEND
+  source: oauth-metadata
+  description: Send SMS and MMS messages.
+- name: DIALING_QUEUE_READ_WRITE
+  source: oauth-metadata
+  description: Manage Power Dialer queues.
+- name: PHONE_NUMBERS_READ
+  source: oauth-metadata
+  description: List phone numbers and their capabilities.
+- name: TAGS_READ
+  source: oauth-metadata
+  description: List available tags.
+- name: TAGS_WRITE
+  source: oauth-metadata
+  description: Add and remove tags on conversation items.
+- name: USERS_READ
+  source: oauth-metadata
+  description: List team members and their roles.
+- name: CRM_READ
+  source: oauth-metadata
+  description: Read CRM people, companies, and deals.
+- name: CRM_WRITE
+  source: oauth-metadata
+  description: Create and update CRM people, companies, and deals.
+- name: CRM_DELETE
+  source: oauth-metadata
+  description: Delete CRM records (e.g. deals).
+- name: SUMMARY_TEMPLATES_READ
+  source: oauth-metadata
+  description: Read call summary templates.
+- name: SUMMARY_TEMPLATES_WRITE
+  source: oauth-metadata
+  description: Create, update, and delete call summary templates.
+- name: NOTES_READ
+  source: oauth-metadata
+  description: Read notes.
+- name: NOTES_WRITE
+  source: oauth-metadata
+  description: Create and update notes.
+- name: THREADS_READ
+  source: oauth-metadata
+  description: Read message threads.
+- name: THREADS_WRITE
+  source: oauth-metadata
+  description: Write / mutate message threads.
+- name: WEBHOOKS_READ_WRITE
+  source: docs
+  description: Create and manage webhook configurations.
+- name: BILLING
+  source: docs
+  description: Access billing and subscription information.
+- name: PARTNER
+  source: docs
+  description: >-
+    Reseller / partner scope required to provision and manage Allo accounts for
+    your customers (POST/GET/DELETE /v2/api/partner/accounts).

@@ -1,0 +1,101 @@
+generated: '2026-07-21'
+method: derived
+source: >-
+  Derived from operation + tag structure in
+  openapi/the-mobile-first-company-allo-openapi.json and the Allo API reference.
+docs: https://help.withallo.com/en/v2/api-reference/introduction
+api: Allo API
+id_conventions:
+  style: prefixed opaque identifiers
+  known_prefixes:
+  - prefix: 'cll-'
+    entity: Call (conversation item)
+  - prefix: 'msg-'
+    entity: Message / SMS (conversation item)
+  note: >-
+    Item ids carry a type prefix (cll- for calls, msg- for messages); an
+    unrecognized prefix returns INVALID_ITEM_ID.
+entities:
+- name: ConversationItem
+  description: A unified call or SMS record; the core object of the conversations surface.
+  subtypes: [call, sms]
+  operations: [listConversations, searchAllConversations, getConversationItem, batchGetConversationItems, updateCallSummary, executeConversationAction]
+- name: Contact
+  description: A person Allo has communicated with, keyed by phone number; conversations are grouped by contact.
+  operations: [searchContacts, createContact, updateContact, getContactContext, getContactConversation]
+- name: Tag
+  description: A label applied to conversation items for filtering.
+  operations: [listTags, addTags, removeTag]
+- name: PhoneNumber
+  description: An Allo phone number or sender ID with capabilities.
+  operations: [getNumbers, listNumbers, setNumberDefaultSummaryTemplate]
+- name: User
+  description: A team member with a role and assignments.
+  operations: [getMe, listUsers, getUser]
+- name: SummaryTemplate
+  description: A template controlling how AI call summaries are structured for the team.
+  operations: [listSummaryTemplates, createSummaryTemplate, getSummaryTemplate, updateSummaryTemplate, deleteSummaryTemplate]
+- name: Webhook
+  description: A subscriber endpoint bound to one or more event topics, with a signing secret.
+  operations: [listWebhooks, createWebhook, getWebhook, updateWebhook, deleteWebhook, listWebhookEventTypes]
+- name: DialingQueue
+  description: A Power Dialer queue of phone numbers assigned to a user.
+  operations: [getCurrentDialingQueue, resetCurrentDialingQueue, upsertCurrentDialingQueue, appendDialingQueueNumbers, clearDialingQueueNumbers]
+- name: Person
+  description: A CRM person record.
+  operations: [createPerson, getPerson, updatePerson, searchPeople]
+- name: Company
+  description: A CRM company record.
+  operations: [createCompany, getCompany, updateCompany, searchCompanies]
+- name: Deal
+  description: A CRM deal, synced from CRM integrations.
+  operations: [createDeal, getDeal, updateDeal, deleteDeal, searchDeals]
+- name: PartnerAccount
+  description: A reseller-provisioned Allo account (one seat on the partner subscription) with a scoped API key.
+  operations: [createPartnerAccount, getPartnerAccount, deletePartnerAccount]
+relationships:
+- from: ConversationItem
+  type: belongs_to
+  to: Contact
+  via: contact phone number (conversations grouped by contact_number)
+- from: ConversationItem
+  type: belongs_to
+  to: PhoneNumber
+  via: Allo number the call/SMS was on (allo_number)
+- from: ConversationItem
+  type: has_many
+  to: Tag
+- from: PhoneNumber
+  type: has_one
+  to: SummaryTemplate
+  via: default_summary_template
+- from: DialingQueue
+  type: belongs_to
+  to: User
+  via: creator_id / assignee
+- from: DialingQueue
+  type: has_many
+  to: PhoneNumber
+  via: queued numbers
+- from: Person
+  type: belongs_to
+  to: Company
+  via: CRM company association
+- from: Deal
+  type: belongs_to
+  to: Person
+- from: Deal
+  type: belongs_to
+  to: Company
+- from: Webhook
+  type: has_many
+  to: EventTopic
+  via: topics[]
+- from: PartnerAccount
+  type: has_one
+  to: PhoneNumber
+  via: provisioned number
+note: >-
+  Relationships are inferred from the API's resource structure and reference
+  documentation, not from an explicit machine-readable ERD. Field-level foreign
+  keys (e.g. exact *_id names) should be confirmed against the object reference.

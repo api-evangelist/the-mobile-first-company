@@ -1,0 +1,68 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  openapi/the-mobile-first-company-allo-openapi.json + Allo API guides +
+  well-known OAuth metadata
+api: Allo API
+standards:
+- id: oauth2
+  conforms: true
+  evidence: >-
+    OAuth 2.0 authorization-server metadata at
+    well-known/the-mobile-first-company-oauth-authorization-server.json —
+    authorization_code + refresh_token + client_credentials grants, S256 PKCE,
+    authorize/token/revoke endpoints under api.withallo.com.
+- id: rfc8414-oauth-as-metadata
+  conforms: true
+  evidence: /.well-known/oauth-authorization-server returns 200 with issuer + endpoints + scopes_supported.
+- id: rfc9728-oauth-protected-resource-metadata
+  conforms: true
+  evidence: mcp.withallo.com/.well-known/oauth-protected-resource (200) declares the MCP server a protected resource of api.withallo.com.
+- id: pkce
+  conforms: true
+  evidence: code_challenge_methods_supported=[S256] in OAuth AS metadata.
+- id: rfc9727-api-catalog
+  conforms: true
+  evidence: www.withallo.com/.well-known/api-catalog (200) linkset binds the API to its OpenAPI, HTML docs, and llms.txt.
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration returns 404; no OpenID Connect surface.
+- id: rfc9457-problem-json
+  conforms: false
+  evidence: Errors use a custom JSON envelope under `error` (application/json), not application/problem+json.
+- id: idempotency
+  conforms: true
+  evidence: All write endpoints accept an Idempotency-Key header with 1-hour replay and Idempotency-Replayed response header (error-handling guide).
+- id: pagination
+  conforms: true
+  evidence: Uniform page/size params and a pagination object (page,size,total_count,total_pages,has_more) on all list/search endpoints.
+- id: rate-limit-headers
+  conforms: true
+  evidence: X-RateLimit-Limit / X-RateLimit-Remaining / X-RateLimit-Reset plus Retry-After on 429.
+- id: webhook-signature-verification
+  conforms: true
+  evidence: Every webhook carries a webhook-signature header verified against the raw body with a per-endpoint signing secret.
+- id: e164-phone-numbers
+  conforms: true
+  evidence: All phone numbers must be E.164; INVALID_PHONE_FORMAT is returned otherwise.
+- id: mcp
+  conforms: true
+  evidence: Official hosted MCP server at https://mcp.withallo.com/mcp (16 tools).
+- id: fhir
+  conforms: false
+  evidence: Not a healthcare API; no FHIR surface.
+- id: fapi
+  conforms: false
+  evidence: No FAPI security-profile conformance claimed.
+- id: scim
+  conforms: false
+  evidence: No SCIM user-provisioning surface.
+- id: odata
+  conforms: false
+  evidence: No OData surface.
+- id: json-api
+  conforms: false
+  evidence: Custom JSON envelopes ({data, pagination} / {error}); not the JSON:API media type.
+- id: psd2
+  conforms: false
+  evidence: Not a financial/open-banking API.

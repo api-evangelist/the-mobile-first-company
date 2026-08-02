@@ -1,0 +1,36 @@
+generated: '2026-07-21'
+method: searched
+source: >-
+  Allo API guides + status.withallo.com + OpenAPI server/path versioning
+docs: https://help.withallo.com/en/v2/api-reference/introduction
+api: Allo API
+versioning:
+  style: URI path
+  current: v2
+  versions:
+  - v1 (/v1/api/**)
+  - v2 (/v2/api/**)
+  stability_policy: >-
+    Error `code` values are documented as stable contracts that will not change
+    without an API version bump. Newer surface (conversations, CRM, analytics,
+    dialing queues, summary templates, partner) is served under /v2/api; a few
+    legacy endpoints (searchCalls, searchContacts, sendSMS, getNumbers) remain
+    under /v1/api.
+status_page:
+  url: https://status.withallo.com
+  provider_hosted: true
+deprecation:
+  policy_found: false
+  sunset_header: not documented
+  note: >-
+    No formal deprecation policy or RFC 8594 Sunset/Deprecation header usage was
+    found in the public documentation as of this pass. Version stability is
+    communicated via the "stable code / version bump" contract above.
+sla:
+  found: false
+  note: >-
+    No public SLA / uptime commitment document was found; a hosted status page
+    is published at status.withallo.com.
+support:
+  email: support@withallo.com
+  help_center: https://help.withallo.com/en/get-started

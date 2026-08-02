@@ -1,0 +1,185 @@
+generated: '2026-07-21'
+method: searched
+docs: https://help.withallo.com/en/v2/api-reference/guides/error-codes
+source: >-
+  https://help.withallo.com/en/v2/api-reference/guides/error-codes +
+  https://help.withallo.com/en/v2/api-reference/guides/error-handling +
+  openapi/the-mobile-first-company-allo-openapi.json
+api: Allo API
+format: json
+format_note: >-
+  Allo does NOT use RFC 9457 application/problem+json. Errors are a custom JSON
+  envelope under an `error` object. Every error carries a stable `code` (a
+  documented contract that will not change without an API version bump), a
+  human-readable `message`, a `retryable` boolean, a `request_id`, and a
+  `doc_url`. Optional fields: `param` (offending parameter), `suggestion` (next
+  action, may name an endpoint), `errors[]` (field-level validation failures),
+  and `retry_after_seconds` (rate limits only).
+envelope:
+  root: error
+  fields:
+  - name: type
+    description: Error category (authentication_error, permission_error, validation_error, not_found_error, conflict_error, rate_limit_error, server_error).
+  - name: code
+    description: Stable, programmatically-actionable error code.
+  - name: message
+    description: Human-readable explanation including the failing value.
+  - name: retryable
+    description: Whether the request can be retried.
+  - name: request_id
+    description: 'Unique id (req_ + 12 alphanumerics); echo the client-supplied X-Request-Id header if provided.'
+  - name: doc_url
+    description: Deep link to the error-code documentation entry.
+  - name: param
+    description: The parameter that caused the error, when applicable.
+  - name: suggestion
+    description: Recommended next action.
+  - name: errors
+    description: Array of field-level errors for validation failures ({field, code, message}).
+  - name: retry_after_seconds
+    description: Seconds to wait before retrying (rate limits only).
+types:
+- type: authentication_error
+  status: 401
+  codes:
+  - code: API_KEY_INVALID
+    remediation: The API key is invalid or does not exist. Check your key in Settings > API.
+  - code: API_KEY_REVOKED
+    remediation: This API key has been revoked. Create a new key in Settings > API.
+  - code: UNAUTHORIZED
+    remediation: 'Provide a valid API key in the Authorization header as `Api-Key <your-key>`.'
+- type: permission_error
+  status: 403
+  codes:
+  - code: API_KEY_INSUFFICIENT_SCOPE
+    remediation: The key lacks the required scope. Create a new key with the needed scope (see scope-to-endpoint mapping).
+  - code: API_KEY_TRIAL_NOT_ALLOWED
+    remediation: API access is not available on trial plans. Upgrade to a paid plan.
+  - code: FORBIDDEN
+    remediation: You do not have permission for this action. Contact your workspace admin.
+  - code: A2P_NOT_ENABLED
+    remediation: A2P (10DLC) SMS is not enabled for this number. Complete 10DLC registration in the dashboard.
+- type: validation_error
+  status: 400
+  codes:
+  - code: INVALID_REQUEST_BODY
+    remediation: 'Ensure Content-Type is application/json and the body is well-formed JSON.'
+  - code: MISSING_PARAMETER
+    remediation: Add the required query parameter named in the `param` field.
+  - code: MISSING_HEADER
+    remediation: Add the required header named in the `param` field.
+  - code: UNSUPPORTED_MEDIA_TYPE
+    remediation: 'Use application/json. Returns 415.'
+    status: 415
+  - code: INVALID_PAGE_SIZE
+    remediation: Provide a numeric `size` between 1 and 100.
+  - code: INVALID_SEARCH_QUERY
+    remediation: The `search` term must contain at least one alphanumeric character; words are AND-combined and prefix-matched.
+  - code: MISSING_ALLO_NUMBER
+    remediation: The `allo_number` parameter is required. List numbers with GET /v2/api/numbers.
+  - code: INVALID_DATE_RANGE
+    remediation: '`from` must be before `to`; use YYYY-MM-DD.'
+  - code: DATE_RANGE_TOO_WIDE
+    remediation: Narrow the date range below the maximum number of days.
+  - code: INVALID_ITEM_ID
+    remediation: 'Item id has an unrecognized prefix. Use cll- for calls, msg- for messages.'
+  - code: BATCH_TOO_LARGE
+    remediation: Split into batches of 100 or fewer.
+  - code: TAGS_REQUIRED
+    remediation: Provide a non-empty `tags` array. List tags with GET /v2/api/tags.
+  - code: INVALID_ACTION
+    remediation: 'Use one of READ, UNREAD, ARCHIVE, UNARCHIVE.'
+  - code: INVALID_GRANULARITY
+    remediation: 'Use one of DAY, WEEK, MONTH.'
+  - code: INVALID_GROUP_BY
+    remediation: See the `suggestion` field for allowed values.
+  - code: UNSUPPORTED_EXTEND_VALUE
+    remediation: 'Currently supported extend value: transcript.'
+  - code: METHOD_NOT_ALLOWED
+    remediation: 'HTTP method not supported for this endpoint. Returns 405.'
+    status: 405
+  - code: INVALID_PHONE_FORMAT
+    remediation: 'Use E.164: +14155551234 (no spaces or dashes).'
+  - code: INVALID_TO_NUMBER
+    remediation: Provide a valid, reachable E.164 destination number.
+  - code: TO_NUMBER_COUNTRY_MISMATCH
+    remediation: Use a phone number in the same country as the recipient.
+  - code: NUMBER_NOT_SMS_ENABLED
+    remediation: Enable SMS on the number, or use a different number.
+  - code: SENDER_ID_INBOX_CANNOT_SEND_SMS
+    remediation: Sender ID inboxes cannot send SMS. Use a regular phone number.
+  - code: SENDER_ID_NOT_ACTIVE
+    remediation: Activate the sender ID in the dashboard before sending.
+  - code: MESSAGE_NOT_COMPLIANT
+    remediation: Remove disallowed content and retry.
+  - code: LANDLINE_NUMBER_NOT_SUPPORTED
+    remediation: Provide a mobile number; landlines cannot receive SMS.
+  - code: SUMMARY_TEMPLATE_KEY_REQUIRED
+    remediation: 'Set `template_key` (e.g. MARKDOWN_CLASSIC or MARKDOWN_SHORT_CALL) to disambiguate.'
+- type: not_found_error
+  status: 404
+  codes:
+  - code: CONVERSATION_ITEM_NOT_FOUND
+    remediation: Search with POST /v2/api/conversations/items/search.
+  - code: MEMBER_NOT_FOUND
+    remediation: List members with GET /v2/api/users.
+  - code: TEAM_NOT_FOUND
+    remediation: Check team setup in the Allo dashboard.
+  - code: USER_NOT_FOUND
+    remediation: Verify the API key is associated with an active account.
+  - code: BUSINESS_NOT_FOUND
+    remediation: Ensure the account has completed onboarding.
+  - code: CALL_NOT_FOUND
+    remediation: Search calls with POST /v2/api/conversations/items/search.
+  - code: TEXT_MESSAGE_NOT_FOUND
+    remediation: Search messages with POST /v2/api/conversations/items/search.
+  - code: PHONE_NUMBER_NOT_FOUND
+    remediation: List numbers with GET /v2/api/numbers.
+  - code: FROM_NUMBER_NOT_FOUND
+    remediation: List your numbers with GET /v2/api/numbers.
+  - code: TAG_NOT_FOUND
+    remediation: The tag does not exist on this item; it may have been removed.
+  - code: SENDER_ID_NOT_FOUND
+    remediation: Check your sender IDs in the dashboard.
+  - code: SUMMARY_TEMPLATE_NOT_FOUND
+    remediation: 'Fetch the call with GET /v2/api/conversations/items/{id} to see which summaries exist.'
+  - code: ENDPOINT_NOT_FOUND
+    remediation: Check the URL and HTTP method against the API reference.
+- type: conflict_error
+  status: 409
+  codes:
+  - code: TAG_ALREADY_EXISTS
+    remediation: The tag is already applied; no action needed.
+  - code: OTHER_TRANSACTION_IN_PROGRESS
+    remediation: Another operation on this resource is in progress; wait and retry.
+  - code: NUMBER_ALREADY_ASSIGNED
+    remediation: 'Set allow_duplicate_number=true, or update the existing person with PUT /v2/api/crm/people/{id}.'
+  - code: IDEMPOTENCY_KEY_REUSE
+    remediation: The idempotency key was already used for a different endpoint/method. Use a unique key per distinct request.
+  - code: PARTNER_ACCOUNT_ALREADY_EXISTS
+    remediation: An account already exists for this partner request.
+  - code: NO_NUMBER_AVAILABLE
+    remediation: No phone number was available to provision.
+- type: rate_limit_error
+  status: 429
+  codes:
+  - code: RATE_LIMIT_EXCEEDED
+    remediation: 'Always retryable. Wait `retry_after_seconds` (and honor the Retry-After header) before retrying.'
+  - code: TRIAL_SMS_LIMIT_REACHED
+    remediation: Trial daily SMS limit reached. Upgrade your plan.
+  - code: SMS_LIMIT_REACHED
+    remediation: Daily API SMS limit reached. Wait until tomorrow or contact support.
+  - code: DAILY_SMS_LIMIT_REACHED
+    remediation: Daily SMS limit reached for this number. Wait until tomorrow.
+- type: billing_error
+  status: 402
+  codes:
+  - code: PARTNER_SUBSCRIPTION_NOT_BILLABLE
+    remediation: The partner subscription cannot be billed for an additional seat.
+  - code: PARTNER_BILLING_FAILED
+    remediation: Could not add a seat to your subscription; check billing.
+- type: server_error
+  status: 500
+  codes:
+  - code: INTERNAL_SERVER_ERROR
+    remediation: 'Retry; if it persists, contact support@withallo.com with your request_id.'

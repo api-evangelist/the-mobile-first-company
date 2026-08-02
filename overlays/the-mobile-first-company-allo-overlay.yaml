@@ -1,0 +1,52 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for the Allo API
+  version: 1.0.0
+# generated: 2026-07-21
+# method: generated
+# source: openapi/the-mobile-first-company-allo-openapi.json + Allo API guides
+extends: ../openapi/the-mobile-first-company-allo-openapi.json
+actions:
+- target: $.info
+  update:
+    x-api-evangelist:
+      enriched: '2026-07-21'
+      provider: The Mobile-First Company
+      product: Allo
+      artifacts:
+        authentication: authentication/the-mobile-first-company-authentication.yml
+        scopes: scopes/the-mobile-first-company-scopes.yml
+        conventions: conventions/the-mobile-first-company-conventions.yml
+        errors: errors/the-mobile-first-company-problem-types.yml
+        lifecycle: lifecycle/the-mobile-first-company-lifecycle.yml
+        webhooks: asyncapi/the-mobile-first-company-webhooks.yml
+        mcp: mcp/the-mobile-first-company-mcp.yml
+        data_model: data-model/the-mobile-first-company-data-model.yml
+    x-conventions:
+      idempotency:
+        header: Idempotency-Key
+        applies_to: write operations (POST, PUT, DELETE)
+        retention: 1 hour
+        replay_header: Idempotency-Replayed
+      pagination:
+        style: page-number
+        params: [page, size]
+        max_size: 100
+      rate_limits:
+        read: 20 rps
+        write: 5 rps
+        headers: [X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset]
+      request_id:
+        response_field: request_id
+        client_header: X-Request-Id
+      error_format: custom-json (not RFC 9457)
+- target: $.servers
+  update:
+  - url: https://api.withallo.com
+    description: Production server (documented base https://api.withallo.com/v2/api)
+- target: $.info
+  update:
+    x-mcp-server:
+      endpoint: https://mcp.withallo.com/mcp
+      hosted: true
+      auth: [oauth2, api_key]

@@ -1,0 +1,49 @@
+generated: '2026-07-21'
+method: searched
+source: live probes of Allo (withallo.com) hosts
+description: >-
+  Well-known discovery endpoints probed across the Allo API, marketing, and MCP
+  hosts. Each entry records the probed path, HTTP status, and the saved raw file
+  where a 200 was captured.
+endpoints:
+- host: api.withallo.com
+  path: /.well-known/oauth-authorization-server
+  url: https://api.withallo.com/.well-known/oauth-authorization-server
+  status: 200
+  file: the-mobile-first-company-oauth-authorization-server.json
+  note: >-
+    OAuth 2.0 Authorization Server Metadata (RFC 8414). Advertises
+    authorization_code + refresh_token + client_credentials grants, PKCE S256,
+    and the full scopes_supported list used by the MCP server and API keys.
+- host: mcp.withallo.com
+  path: /.well-known/oauth-protected-resource
+  url: https://mcp.withallo.com/.well-known/oauth-protected-resource
+  status: 200
+  file: the-mobile-first-company-oauth-protected-resource.json
+  note: >-
+    OAuth 2.0 Protected Resource Metadata (RFC 9728) for the hosted MCP server,
+    pointing at api.withallo.com as its authorization server.
+- host: www.withallo.com
+  path: /.well-known/api-catalog
+  url: https://www.withallo.com/.well-known/api-catalog
+  status: 200
+  file: the-mobile-first-company-api-catalog.json
+  note: >-
+    RFC 9727 API catalog linkset anchoring api.withallo.com to its OpenAPI
+    (service-desc), HTML reference (service-doc), and llms.txt (service-meta).
+- host: api.withallo.com
+  path: /.well-known/security.txt
+  url: https://api.withallo.com/.well-known/security.txt
+  status: 404
+- host: www.withallo.com
+  path: /.well-known/security.txt
+  url: https://www.withallo.com/.well-known/security.txt
+  status: 404
+- host: api.withallo.com
+  path: /.well-known/openid-configuration
+  url: https://api.withallo.com/.well-known/openid-configuration
+  status: 404
+- host: api.withallo.com
+  path: /.well-known/ai-plugin.json
+  url: https://api.withallo.com/.well-known/ai-plugin.json
+  status: 404

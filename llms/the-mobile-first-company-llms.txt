@@ -1,0 +1,147 @@
+# Allo — Help Center
+
+> Documentation and support for Allo - the AI phone system built for small sales teams
+
+## Docs
+
+- [Billing and Payments](https://help.withallo.com/en/billing/billing-and-payments.md): Invoices, payment methods, and billing information
+- [How the free trial works](https://help.withallo.com/en/billing/free-trial.md): Trial length, what's included, what's restricted, and how billing starts
+- [International calling](https://help.withallo.com/en/billing/international-calling-rates.md): How international calling works on Allo: enabling it on a number, buying credits, auto-recharge, checking rates, and what gets billed.
+- [Manage Subscription](https://help.withallo.com/en/billing/manage-subscription.md): Plans, pricing, billing, and subscription management
+- [Plans and Pricing](https://help.withallo.com/en/billing/plans-and-pricing.md): Compare Solo, Business and Ultra. Per-user pricing, no setup fees, no contracts.
+- [AI Assistant](https://help.withallo.com/en/features/ai-assistant.md): Chat with AI about your calls to get insights, draft follow-ups, and find information
+- [Business Hours](https://help.withallo.com/en/features/business-hours.md): Set when you're available and what happens outside hours
+- [Call Recording Compliance](https://help.withallo.com/en/features/call-recording-compliance.md): Configure Allo's compliance tools for call recording laws in the US, EU, and beyond
+- [Call Recordings](https://help.withallo.com/en/features/call-recordings.md): Automatic call recording, transcription, and AI summaries
+- [Call Routing](https://help.withallo.com/en/features/call-routing.md): Configure how calls reach you and your team
+- [Call Tags](https://help.withallo.com/en/features/call-tags.md): Categorize calls during or after they happen, manually or automatically with AI, and sync them to HubSpot
+- [Call Transfer](https://help.withallo.com/en/features/call-transfer.md): Transfer live calls to team members
+- [IVR (Interactive Menu)](https://help.withallo.com/en/features/ivr.md): Create professional phone menus for call routing
+- [Power Dialer](https://help.withallo.com/en/features/power-dialer.md): Load a list of numbers and let Allo dial them back to back, so reps spend their time talking instead of clicking
+- [Virtual Receptionist](https://help.withallo.com/en/features/virtual-receptionist.md): Intelligent call handling with customizable AI assistant
+- [Voicemail](https://help.withallo.com/en/features/voicemail.md): Set up voicemail and customize greeting messages
+- [Help Center](https://help.withallo.com/en/get-started/index.md): Find answers, explore features, and build with our API.
+- [Numbers and users](https://help.withallo.com/en/get-started/numbers-and-users.md): Two distinct building blocks — and why understanding the difference matters
+- [Solo User](https://help.withallo.com/en/get-started/solo-user.md): Set up Allo for yourself in minutes
+- [Team Admin](https://help.withallo.com/en/get-started/team-admin.md): Set up Allo for your entire team
+- [Team Member](https://help.withallo.com/en/get-started/team-member.md): Join your team on Allo
+- [What is Allo?](https://help.withallo.com/en/get-started/what-is-allo.md): Learn about Allo, the AI-first phone system built for small sales teams
+- [Identity Verification](https://help.withallo.com/en/help/get-started/getting-started/identity-verification.md): Understand the identity verification process to activate your Allo account
+- [Notion](https://help.withallo.com/en/help/integrations/productivity/notion.md): Automatically log call recordings and summaries to your Notion workspace
+- [Apollo](https://help.withallo.com/en/integrations/apollo.md): Auto-sync calls, texts, and voicemails to Apollo. Contacts, companies, and deals stay aligned with no manual updates. Business plan only.
+- [Attio](https://help.withallo.com/en/integrations/attio.md): Automatically sync call recordings and summaries to your Attio CRM
+- [Brevo](https://help.withallo.com/en/integrations/brevo.md): Automatically sync call recordings and summaries to your Brevo CRM
+- [Claap](https://help.withallo.com/en/integrations/claap.md): Automatically send your call recordings and transcriptions to Claap for analysis
+- [Claude Connector](https://help.withallo.com/en/integrations/claude-connector.md): Use Allo from inside Claude.ai — look up contacts, send SMS, and check calls without leaving the chat.
+- [folk](https://help.withallo.com/en/integrations/folk.md): Automatically sync call recordings and summaries to your folk CRM
+- [GoHighLevel](https://help.withallo.com/en/integrations/gohighlevel.md): Sync contacts and companies from GoHighLevel into Allo. Every call logs back to GoHighLevel automatically with AI summaries and recordings.
+- [Google Contacts](https://help.withallo.com/en/integrations/google-contacts.md): Two-way sync between Allo and your Google Contacts
+- [Google Spreadsheet](https://help.withallo.com/en/integrations/google-spreadsheets.md): Automatically log all calls to a Google Spreadsheet
+- [HubSpot](https://help.withallo.com/en/integrations/hubspot.md): Automatically sync call recordings and summaries to your HubSpot CRM
+- [Intercom](https://help.withallo.com/en/integrations/intercom.md): Automatically sync call recordings and summaries to your Intercom workspace
+- [Make](https://help.withallo.com/en/integrations/make.md): Build custom workflows and automations using Allo call data
+- [MCP Server](https://help.withallo.com/en/integrations/mcp.md): Connect Allo to AI assistants like Claude, Cursor, and VS Code using the Model Context Protocol
+- [Odoo](https://help.withallo.com/en/integrations/odoo.md): Automatically recognize contacts from your Odoo CRM and log all calls and messages
+- [Overview](https://help.withallo.com/en/integrations/overview.md): Connect Allo with your favorite tools and automate your workflow
+- [Pipedrive](https://help.withallo.com/en/integrations/pipedrive.md): Automatically log every call as a Pipedrive activity with AI summaries and recordings. Business plan only.
+- [Salesforce](https://help.withallo.com/en/integrations/salesforce.md): Automatically sync call recordings and summaries to your Salesforce CRM
+- [Sellsy](https://help.withallo.com/en/integrations/sellsy.md): Automatically sync contacts and log calls with summaries to your Sellsy CRM
+- [Shopify](https://help.withallo.com/en/integrations/shopify.md): Automatically recognize customers from your Shopify store when they call
+- [Streak](https://help.withallo.com/en/integrations/streak.md): Automatically sync call recordings and summaries to your Streak CRM
+- [Webhooks](https://help.withallo.com/en/integrations/webhooks.md): Receive real-time notifications when calls, SMS, and contacts events happen in your Allo account
+- [Zapier](https://help.withallo.com/en/integrations/zapier.md): Connect Allo with 5000+ apps using Zapier automation
+- [Zoho CRM](https://help.withallo.com/en/integrations/zoho.md): Automatically sync contacts and log calls with summaries to your Zoho CRM
+- [Buy additional numbers](https://help.withallo.com/en/phone-numbers/buy-additional-numbers.md): Add more phone numbers to your Allo account
+- [Caller ID Name (CNAM)](https://help.withallo.com/en/phone-numbers/caller-id-name.md): Display your business name when you call US and Canadian numbers
+- [Connect personal number](https://help.withallo.com/en/phone-numbers/connect-personal-number.md): Forward calls from your existing phone number to Allo to get AI features on all your calls
+- [Connect to WhatsApp](https://help.withallo.com/en/phone-numbers/connect-to-whatsapp.md): Use your Allo number for WhatsApp
+- [International phone numbers](https://help.withallo.com/en/phone-numbers/international-numbers.md): Complete list of 120+ countries where you can get a business phone number with Allo — including setup times, document requirements, and SMS availability
+- [Port existing number](https://help.withallo.com/en/phone-numbers/port-existing-number.md): Transfer your current phone number to Allo, for free, in a few business days
+- [SMS & Messaging](https://help.withallo.com/en/phone-numbers/sms-overview.md): Send and receive text messages, set up automatic replies, and comply with US and French regulations.
+- [Your Allo number](https://help.withallo.com/en/phone-numbers/understanding-allo-number.md): Learn about your Allo business number and how it works
+- [Common Issues](https://help.withallo.com/en/support/common-issues.md): Solutions to frequently encountered problems
+- [Contact Support](https://help.withallo.com/en/support/contact.md): Reach our team through the web chat widget or by email
+- [FAQ](https://help.withallo.com/en/support/faq.md): Quick answers to frequently asked questions
+- [Partner Program](https://help.withallo.com/en/support/partner-program.md): Partner with Allo. Three ways to work together: refer clients, resell Allo as a service, or embed it in your own product.
+- [Analytics](https://help.withallo.com/en/team/analytics.md): Track team performance and call metrics
+- [Manage team members](https://help.withallo.com/en/team/manage-members.md): Add, remove, and manage your team
+- [Overview](https://help.withallo.com/en/team/overview.md): Collaborate on calls with your team
+- [Shared contacts](https://help.withallo.com/en/team/shared-contacts.md): How contacts are shared with your team, and how to import a directory
+- [Supervise your team's calls](https://help.withallo.com/en/team/supervise-team-calls.md): What admins can see, team roles, and viewer seats
+- [Outbound metrics](https://help.withallo.com/en/v2/api-reference/analytics/outbound.md): Returns outbound call metrics: dial funnel (dials → connected → conversations → conversions), time series, heatmap, leaderboard, and time spent metrics.
+- [Overview](https://help.withallo.com/en/v2/api-reference/analytics/overview.md): Pre-computed call metrics and team performance analytics
+- [Team metrics](https://help.withallo.com/en/v2/api-reference/analytics/team-summary.md): Returns team-wide KPIs with period-over-period comparison and a per-user breakdown. Covers all calls (inbound + outbound).
+- [Get many conversation items](https://help.withallo.com/en/v2/api-reference/conversations/batch-get.md): Returns multiple conversation items by their IDs in a single request. Use this to fetch full details (summary, tags, recording, etc.) for items returned by the analytics drilldown or any other list.
+- [Execute conversation action](https://help.withallo.com/en/v2/api-reference/conversations/execute-action.md): Execute an action on a conversation.
+- [Get conversation item](https://help.withallo.com/en/v2/api-reference/conversations/get-item.md): Returns a single call or SMS message by its ID.
+- [List conversations](https://help.withallo.com/en/v2/api-reference/conversations/list-conversations.md): Returns a paginated list of conversations grouped by contact phone number, sorted by most recent activity.
+- [Overview](https://help.withallo.com/en/v2/api-reference/conversations/overview.md): Unified call and SMS history with keyword search and rich filtering
+- [Search conversation items](https://help.withallo.com/en/v2/api-reference/conversations/search-conversation-items.md): Search and filter items across all conversations. Supports keyword search across transcripts, summaries, and message content.
+- [Update call summary](https://help.withallo.com/en/v2/api-reference/conversations/update-summary.md): Replace the markdown content of a call's AI-generated summary.
+- [Overview](https://help.withallo.com/en/v2/api-reference/crm/companies-overview.md): Manage companies in your Allo CRM
+- [Create company](https://help.withallo.com/en/v2/api-reference/crm/create-company.md): Creates a new company in your CRM.
+- [Create person](https://help.withallo.com/en/v2/api-reference/crm/create-person.md): Creates a new person in your CRM.
+- [Overview](https://help.withallo.com/en/v2/api-reference/crm/deals-overview.md): Access deals synced from your CRM integrations
+- [Get company](https://help.withallo.com/en/v2/api-reference/crm/get-company.md): Returns a single company by ID.
+- [Get deal](https://help.withallo.com/en/v2/api-reference/crm/get-deal.md): Returns a single deal by ID.
+- [Get person](https://help.withallo.com/en/v2/api-reference/crm/get-person.md): Returns a single person by ID.
+- [Overview](https://help.withallo.com/en/v2/api-reference/crm/people-overview.md): Manage people in your Allo CRM
+- [Search companies](https://help.withallo.com/en/v2/api-reference/crm/search-companies.md): Search and filter companies in your CRM.
+- [Search deals](https://help.withallo.com/en/v2/api-reference/crm/search-deals.md): Search and filter deals in your CRM.
+- [Search people](https://help.withallo.com/en/v2/api-reference/crm/search-people.md): Search and filter people in your CRM with advanced filtering, sorting, and pagination.
+- [Update company](https://help.withallo.com/en/v2/api-reference/crm/update-company.md): Updates an existing company. Only provided fields will be updated.
+- [Update person](https://help.withallo.com/en/v2/api-reference/crm/update-person.md): Updates an existing person. Only provided fields will be updated.
+- [Append numbers](https://help.withallo.com/en/v2/api-reference/dialing-queues/append-numbers.md): Appends phone numbers to the Power Dialer queue assigned to the authenticated user. Creates the queue implicitly if none exists. Send `user_id` or `email` to append to a teammate's queue — if that teammate has no current queue, one is created with the API key owner as `creator_id` and the teammate a…
+- [Clear queue numbers](https://help.withallo.com/en/v2/api-reference/dialing-queues/clear-numbers.md): Removes numbers from the queue assigned to the authenticated user. Exactly one filter must be supplied via query string: `number` (E.164), `position` (0-based index), `number` + `position` together (delete a specific occurrence of a duplicate), or `unassigned=true` (remove every entry that has not b…
+- [List current queue numbers](https://help.withallo.com/en/v2/api-reference/dialing-queues/get-current.md): Returns the numbers in the Power Dialer queue currently assigned to the authenticated user, paginated and ordered by `position` ascending. `data` is the list of numbers (use `page`/`size` and read `pagination` to page through them); the `queue` key carries the queue's metadata (id, name, settings) w…
+- [Overview](https://help.withallo.com/en/v2/api-reference/dialing-queues/overview.md): Manage Power Dialer queues programmatically
+- [Reset current queue](https://help.withallo.com/en/v2/api-reference/dialing-queues/reset-current.md): Creates a fresh, empty queue assigned to the authenticated user. Any older queue with the same assignee stops being returned by `GET /current` (the newest queue wins). Send `user_id` or `email` to create the queue for a teammate instead — the API key owner is recorded as `creator_id`, the teammate a…
+- [Upsert current queue](https://help.withallo.com/en/v2/api-reference/dialing-queues/update-current.md): Creates or updates the config of the queue assigned to the authenticated user. Send `user_id` or `email` to act on a teammate's queue instead — `user_id` wins when both are provided.
+- [Authentication](https://help.withallo.com/en/v2/api-reference/guides/authentication.md): Authenticate API requests using API keys
+- [Common use cases](https://help.withallo.com/en/v2/api-reference/guides/common-use-cases.md): Examples of how to use the Allo API to answer business questions and automate workflows
+- [Error codes](https://help.withallo.com/en/v2/api-reference/guides/error-codes.md): Complete catalog of all API error codes with recovery instructions
+- [Error handling](https://help.withallo.com/en/v2/api-reference/guides/error-handling.md): Standardized error responses with actionable suggestions
+- [Pagination](https://help.withallo.com/en/v2/api-reference/guides/pagination.md): Page-based pagination with total counts on all list endpoints
+- [Rate limits](https://help.withallo.com/en/v2/api-reference/guides/rate-limits.md): Request limits and response headers
+- [Overview](https://help.withallo.com/en/v2/api-reference/introduction.md): Integrate Allo's communication capabilities into your applications
+- [Create account](https://help.withallo.com/en/v2/api-reference/partner/create-account.md): Creates an Allo account for one of your customers, provisions a phone number, and returns a scoped API key for the account. Requires the `PARTNER` scope. The account is billed as one seat on your subscription.
+- [Deactivate account](https://help.withallo.com/en/v2/api-reference/partner/delete-account.md): Deactivates an account you provisioned and releases its seat. The account stays active until the end of the current paid period, then expires. Requires the `PARTNER` scope.
+- [Get account](https://help.withallo.com/en/v2/api-reference/partner/get-account.md): Returns the status and activation state of an account you provisioned. Requires the `PARTNER` scope.
+- [Overview](https://help.withallo.com/en/v2/api-reference/partner/overview.md): Provision and manage Allo accounts for your customers as a reseller.
+- [List phone numbers](https://help.withallo.com/en/v2/api-reference/phone-numbers/list-numbers.md): Returns all phone numbers and sender IDs on your team.
+- [Overview](https://help.withallo.com/en/v2/api-reference/phone-numbers/overview.md): Access your Allo phone numbers, sender IDs, and their capabilities
+- [Overview](https://help.withallo.com/en/v2/api-reference/sms/overview.md): Send SMS and MMS messages programmatically
+- [Send SMS](https://help.withallo.com/en/v2/api-reference/sms/send-sms.md): Send an SMS message to a US phone number using one of your Allo phone numbers. The recipient must be in the same country as your Allo number.
+- [Send SMS (France)](https://help.withallo.com/en/v2/api-reference/sms/send-sms-france.md): Send an SMS message to a French phone number using a verified Sender ID. The Sender ID must be verified by the Allo team before use. Contact support to register your Sender ID.
+- [Create summary template](https://help.withallo.com/en/v2/api-reference/summary-templates/create-summary-template.md): Creates a call summary template for the team.
+- [Delete summary template](https://help.withallo.com/en/v2/api-reference/summary-templates/delete-summary-template.md): Soft-deletes (deactivates) a summary template.
+- [Get summary template](https://help.withallo.com/en/v2/api-reference/summary-templates/get-summary-template.md): Returns a single call summary template by ID.
+- [List summary templates](https://help.withallo.com/en/v2/api-reference/summary-templates/list-summary-templates.md): Returns the team's call summary templates.
+- [Overview](https://help.withallo.com/en/v2/api-reference/summary-templates/overview.md): Manage the call summary templates that shape AI-generated call summaries
+- [Set a number's default template](https://help.withallo.com/en/v2/api-reference/summary-templates/set-number-default-summary-template.md): Sets or clears the default summary template used for a phone number's call summaries. Pass `summary_template_id` to set it, or null/omit to clear it.
+- [Update summary template](https://help.withallo.com/en/v2/api-reference/summary-templates/update-summary-template.md): Replaces a summary template's name, call context, icon, and sections.
+- [Add tags](https://help.withallo.com/en/v2/api-reference/tags/add-tags.md): Add one or more tags to a conversation item.
+- [List tags](https://help.withallo.com/en/v2/api-reference/tags/list-tags.md): Returns all tags configured on the team.
+- [Overview](https://help.withallo.com/en/v2/api-reference/tags/overview.md): Discover available call tags for filtering conversations
+- [Remove tag](https://help.withallo.com/en/v2/api-reference/tags/remove-tag.md): Remove a tag from a conversation item.
+- [Get user](https://help.withallo.com/en/v2/api-reference/users/get-user.md): Returns a single team member by their ID.
+- [List users](https://help.withallo.com/en/v2/api-reference/users/list-users.md): Returns all team members.
+- [Me](https://help.withallo.com/en/v2/api-reference/users/me.md): Returns information about the authenticated API key: its scopes, available endpoints, team, and rate limits. No specific scope is required — any valid API key can call this endpoint.
+- [Overview](https://help.withallo.com/en/v2/api-reference/users/overview.md): Access your team roster with roles and status
+- [Best practices](https://help.withallo.com/en/v2/api-reference/webhooks/best-practices.md): Recommendations for building reliable webhook consumers
+- [Create webhook](https://help.withallo.com/en/v2/api-reference/webhooks/create-webhook.md): Creates a webhook endpoint subscribed to one or more event topics. The `signing_secret` is returned only in this response — store it to verify delivery signatures.
+- [Delete webhook](https://help.withallo.com/en/v2/api-reference/webhooks/delete-webhook.md): Permanently deletes a webhook endpoint and its delivery history.
+- [Delivery and retries](https://help.withallo.com/en/v2/api-reference/webhooks/delivery-and-retries.md): How Allo delivers webhooks, retries failures, and handles recovery
+- [Event catalog](https://help.withallo.com/en/v2/api-reference/webhooks/event-catalog.md): Full reference for all webhook event types and their payloads
+- [Get webhook](https://help.withallo.com/en/v2/api-reference/webhooks/get-webhook.md): Returns a single webhook endpoint by ID, including its `signing_secret`.
+- [List webhooks](https://help.withallo.com/en/v2/api-reference/webhooks/get-webhooks.md): Returns all webhook endpoints configured for your account.
+- [List event types](https://help.withallo.com/en/v2/api-reference/webhooks/list-event-types.md): Returns the catalog of event topics you can subscribe a webhook to.
+- [Overview](https://help.withallo.com/en/v2/api-reference/webhooks/overview.md): Receive real-time notifications when events occur in your Allo account
+- [Testing webhooks](https://help.withallo.com/en/v2/api-reference/webhooks/testing.md): Test your webhook endpoints before going live
+- [Troubleshoot](https://help.withallo.com/en/v2/api-reference/webhooks/troubleshooting.md): Diagnose and fix common webhook delivery issues
+- [Update webhook](https://help.withallo.com/en/v2/api-reference/webhooks/update-webhook.md): Updates a webhook endpoint. Only the fields you provide are changed. Omitted fields are left untouched.
+- [Verifying webhook signatures](https://help.withallo.com/en/v2/api-reference/webhooks/verifying-signatures.md): Authenticate incoming webhooks using HMAC-SHA256 signatures
+
+## OpenAPI Specs
+
+- [openapi](https://help.withallo.com/openapi.json)
