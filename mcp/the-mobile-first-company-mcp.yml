@@ -2,7 +2,8 @@ generated: '2026-07-21'
 method: searched
 source: https://www.withallo.com/mcp + https://mcp.withallo.com/.well-known/oauth-protected-resource
 name: Allo MCP Server
-status: live
+status: published
+status_raw: live
 transport: streamable-http
 hosted: true
 endpoint: https://mcp.withallo.com/mcp
