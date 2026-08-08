@@ -298,7 +298,7 @@ common:
   url: https://www.withallo.com/terms-conditions
 - type: PrivacyPolicy
   url: https://www.withallo.com/privacy-policy
-- type: MCP
+- type: MCPServer
   url: https://www.withallo.com/mcp
 x-enrichment:
   date: '2026-07-21'
