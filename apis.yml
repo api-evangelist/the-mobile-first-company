@@ -245,7 +245,7 @@ common:
 - type: Authentication
   url: authentication/the-mobile-first-company-authentication.yml
 - type: OpenAPI
-  url: openapi/the-mobile-first-company-allo-openapi.json
+  url: openapi/_original/the-mobile-first-company-allo-openapi.json
 - type: Overlay
   url: overlays/the-mobile-first-company-allo-overlay.yaml
 - type: OAuthScopes
