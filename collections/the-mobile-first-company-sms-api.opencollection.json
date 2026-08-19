@@ -1,0 +1,60 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Allo Analytics SMS API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "SMS",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send SMS (US)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v1/api/sms",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Send an SMS message to a US phone number using one of your Allo phone numbers. The recipient must be in the same country as your Allo number."
+        },
+        {
+          "info": {
+            "name": "Send SMS (France)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v1/api/sms#france",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Send an SMS message to a French phone number using a verified Sender ID. The Sender ID must be verified by the Allo team before use. Contact support to register your Sender ID."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

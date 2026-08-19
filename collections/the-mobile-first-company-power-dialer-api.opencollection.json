@@ -1,0 +1,173 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Allo Analytics Power Dialer API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Power Dialer",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List current queue numbers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v2/api/dialing-queues/current",
+            "params": [
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "query",
+                "description": "ID of a teammate to read the queue for. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided."
+              },
+              {
+                "name": "email",
+                "value": "",
+                "type": "query",
+                "description": "Email of a teammate to read the queue for. Ignored when `user_id` is also supplied."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "1-indexed page number for the queue's `numbers`."
+              },
+              {
+                "name": "size",
+                "value": "",
+                "type": "query",
+                "description": "Number of `numbers` per page (max 100)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns the numbers in the Power Dialer queue currently assigned to the authenticated user, paginated and ordered by `position` ascending. `data` is the list of numbers (use `page`/`size` and read `pagination` to page through them); the `queue` key carries the queue's metadata (id, name, settings) without its numbers. To target a teammate's queue, pass either `user_id` or `email` as a query parameter (`user_id` wins when both are sent); the target must belong to the same team as the API key owne"
+        },
+        {
+          "info": {
+            "name": "Reset current queue",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v2/api/dialing-queues/current",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates a fresh, empty queue assigned to the authenticated user. Any older queue with the same assignee stops being returned by `GET /current` (the newest queue wins). Send `user_id` or `email` to create the queue for a teammate instead — the API key owner is recorded as `creator_id`, the teammate as `assignee_id`. `user_id` wins when both are provided."
+        },
+        {
+          "info": {
+            "name": "Upsert current queue",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.withallo.com/v2/api/dialing-queues/current",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates or updates the config of the queue assigned to the authenticated user. Send `user_id` or `email` to act on a teammate's queue instead — `user_id` wins when both are provided."
+        },
+        {
+          "info": {
+            "name": "Append numbers to queue",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v2/api/dialing-queues/current/numbers",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Appends phone numbers to the Power Dialer queue assigned to the authenticated user. Creates the queue implicitly if none exists. Send `user_id` or `email` to append to a teammate's queue — if that teammate has no current queue, one is created with the API key owner as `creator_id` and the teammate as `assignee_id`. `user_id` wins when both are provided."
+        },
+        {
+          "info": {
+            "name": "Clear queue numbers",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.withallo.com/v2/api/dialing-queues/current/numbers",
+            "params": [
+              {
+                "name": "number",
+                "value": "",
+                "type": "query",
+                "description": "Phone number to remove (any format — normalized to E.164). Removes every entry matching this number unless `position` is also supplied."
+              },
+              {
+                "name": "position",
+                "value": "",
+                "type": "query",
+                "description": "0-based position to remove. Combine with `number` to disambiguate when the same number appears more than once."
+              },
+              {
+                "name": "unassigned",
+                "value": "",
+                "type": "query",
+                "description": "When `true`, removes every queue entry that has not been called yet. Cannot be combined with `number` or `position`."
+              },
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "query",
+                "description": "ID of a teammate whose queue to clear. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided."
+              },
+              {
+                "name": "email",
+                "value": "",
+                "type": "query",
+                "description": "Email of a teammate whose queue to clear. Ignored when `user_id` is also supplied."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Removes numbers from the queue assigned to the authenticated user. Exactly one filter must be supplied via query string: `number` (E.164), `position` (0-based index), `number` + `position` together (delete a specific occurrence of a duplicate), or `unassigned=true` (remove every entry that has not been called yet). Combining `unassigned` with `number` or `position` is rejected. Pass `user_id` or `email` to clear a teammate's queue instead — `user_id` wins when both are provided."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

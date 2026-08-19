@@ -1,0 +1,453 @@
+{
+  "item": [
+    {
+      "id": "59e85b92-da79-48a1-945a-fa15f8de1be9",
+      "name": "Phone Numbers",
+      "description": {
+        "content": "Retrieve information about your Allo phone numbers.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "4061a732-226f-49f1-93b2-8571d54a0782",
+          "name": "Get Phone Numbers",
+          "request": {
+            "name": "Get Phone Numbers",
+            "description": {
+              "content": "Retrieve all Allo phone numbers associated with your account. Returns basic information about each number including country, name, and sharing status.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "api",
+                "numbers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "9e378f6c-9aed-4b34-932e-faee26753823",
+              "name": "Phone numbers retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"number\": \"+1234567890\",\n      \"name\": \"Main Line\",\n      \"country\": \"US\",\n      \"is_shared_number\": false\n    },\n    {\n      \"number\": \"+33612345678\",\n      \"name\": \"France Office\",\n      \"country\": \"FR\",\n      \"is_shared_number\": true\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eda30c31-f9d8-4e47-af1c-9d117f04603f",
+              "name": "Unauthorized - Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"API_KEY_INVALID\",\n  \"details\": null\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "79645f97-5343-40e8-955b-dcf3be403b07",
+              "name": "Forbidden - API key lacks required scope",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"API_KEY_INSUFFICIENT_SCOPE\",\n  \"details\": [\n    {\n      \"message\": \"required=CONTACTS_READ\",\n      \"field\": \"scope\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "66d0cc39-178a-4bca-8135-11d845dd0b2b",
+              "name": "Too Many Requests - Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": \"API_KEY_QUOTA_EXCEEDED\",\n  \"details\": [\n    {\n      \"message\": \"limit=1000;type=DAILY;reset_in=3600\",\n      \"field\": \"DAILY\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b3b2b921-87d3-434f-a457-092944a2185d",
+          "name": "List phone numbers",
+          "request": {
+            "name": "List phone numbers",
+            "description": {
+              "content": "Returns all phone numbers and sender IDs on your team.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "numbers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "6dbd4fba-50c0-412e-a5ba-d0a8b8ad8031",
+              "name": "List of phone numbers",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"number\": \"+14155550100\",\n      \"name\": \"Sales US\",\n      \"country\": \"US\",\n      \"type\": \"NUMBER\",\n      \"capabilities\": [\n        \"VOICE\",\n        \"SMS\",\n        \"MMS\"\n      ],\n      \"users\": [\n        {\n          \"id\": \"usr-abc123\",\n          \"name\": \"Adrien\",\n          \"email\": \"adrien@company.com\"\n        }\n      ]\n    },\n    {\n      \"number\": \"+33612345678\",\n      \"name\": \"Support FR\",\n      \"country\": \"FR\",\n      \"type\": \"NUMBER\",\n      \"capabilities\": [\n        \"VOICE\"\n      ],\n      \"users\": [\n        {\n          \"id\": \"usr-abc123\",\n          \"name\": \"Adrien\",\n          \"email\": \"adrien@company.com\"\n        },\n        {\n          \"id\": \"usr-def456\",\n          \"name\": \"Marie\",\n          \"email\": \"marie@company.com\"\n        }\n      ]\n    },\n    {\n      \"number\": null,\n      \"name\": \"Acme Corp\",\n      \"country\": \"FR\",\n      \"type\": \"SENDER_ID\",\n      \"capabilities\": [\n        \"SMS\"\n      ],\n      \"users\": []\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "36279f4a-bb5c-4d8e-b214-f0f0ba9b60b0",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 3403\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b09b5834-ed01-469f-aa5a-1ce3da6b25ef",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 3403\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.withallo.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "3ff028ae-d429-44c8-8927-3087e5ae4bba",
+    "name": "Allo Analytics Phone Numbers API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.\n\nAll requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.\n\nContact Support:\n Name: Allo Support",
+      "type": "text/plain"
+    }
+  }
+}

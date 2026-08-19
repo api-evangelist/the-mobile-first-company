@@ -8,23 +8,18 @@ transport: streamable-http
 hosted: true
 endpoint: https://mcp.withallo.com/mcp
 docs: https://www.withallo.com/mcp
-description: >-
-  Official hosted (remote) Model Context Protocol server for Allo, the AI phone
-  system by The Mobile-First Company. Exposes Allo's call/SMS/CRM surface to AI
-  agents with the same permissions the connecting team already has. Included in
-  all Allo plans at no extra cost.
+description: Official hosted (remote) Model Context Protocol server for Allo, the AI phone system by The
+  Mobile-First Company. Exposes Allo's call/SMS/CRM surface to AI agents with the same permissions the
+  connecting team already has. Included in all Allo plans at no extra cost.
 authentication:
   methods:
   - type: oauth2
-    description: >-
-      OAuth via Claude Connector (recommended for Claude.ai / Claude Desktop).
-      Authorization server is https://api.withallo.com (see
-      well-known/the-mobile-first-company-oauth-authorization-server.json).
+    description: OAuth via Claude Connector (recommended for Claude.ai / Claude Desktop). Authorization
+      server is https://api.withallo.com (see well-known/the-mobile-first-company-oauth-authorization-server.json).
     claude_desktop_client_id: b82803e6-31d4-47e0-9d7e-db9826ee451b
   - type: api_key
-    description: >-
-      Allo API key passed in the Authorization header for local clients (Cursor,
-      VS Code, Claude Code) configured via .cursor/mcp.json / .vscode/mcp.json.
+    description: Allo API key passed in the Authorization header for local clients (Cursor, VS Code, Claude
+      Code) configured via .cursor/mcp.json / .vscode/mcp.json.
     header: 'Authorization: Api-Key ak_live_...'
 authorization_server: https://api.withallo.com
 tool_groups:
@@ -49,7 +44,12 @@ tool_groups:
   - dial funnel metrics
   - leaderboard data
 tool_count: 16
-note: >-
-  Tool group breakdown captured verbatim from the provider MCP page; the 16
-  tools mirror the operations in openapi/the-mobile-first-company-allo-openapi.json
-  (conversations, tags, sms, dialing-queues, analytics, users, numbers, tags).
+note: Tool group breakdown captured verbatim from the provider MCP page; the 16 tools mirror the operations
+  in openapi/the-mobile-first-company-allo-openapi.json (conversations, tags, sms, dialing-queues, analytics,
+  users, numbers, tags).
+deployment:
+  mode: remote
+  verified: searched
+  tools: 16
+  checked: '2026-08-12'
+  source: catalog MCP census

@@ -1,0 +1,598 @@
+{
+  "item": [
+    {
+      "id": "eb287e73-6b05-458f-aaff-301338f29f03",
+      "name": "Analytics",
+      "description": {
+        "content": "Pre-computed call metrics, team performance, and outbound dial funnel",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9b6b7cee-1fcb-44cd-8ea4-3e59bd148912",
+          "name": "Team metrics",
+          "request": {
+            "name": "Team metrics",
+            "description": {
+              "content": "Returns team-wide KPIs with period-over-period comparison and a per-user breakdown. Covers all calls (inbound + outbound).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "analytics",
+                "overview"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": {\n    \"from\": \"<date>\",\n    \"to\": \"<date>\"\n  },\n  \"compare_date\": {\n    \"from\": \"<date>\",\n    \"to\": \"<date>\"\n  },\n  \"user_ids\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"allo_numbers\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a5cb383a-85ce-4259-bdee-c892fc484cba",
+              "name": "Team summary",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "overview"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"user_ids\": [\n    \"usr-abc123\",\n    \"usr-def456\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"date\": {\n      \"from\": \"2026-03-25\",\n      \"to\": \"2026-04-21\"\n    },\n    \"compare_date\": {\n      \"from\": \"2026-02-25\",\n      \"to\": \"2026-03-24\"\n    },\n    \"summary\": {\n      \"total_calls\": {\n        \"value\": 2899,\n        \"previous\": 2512,\n        \"change\": 0.15\n      },\n      \"talk_time_seconds\": {\n        \"value\": 81720,\n        \"previous\": 103380,\n        \"change\": -0.21\n      },\n      \"calls_over_1_min\": {\n        \"value\": 290,\n        \"previous\": 310,\n        \"change\": -0.06\n      },\n      \"answer_rate\": {\n        \"value\": 0.503,\n        \"previous\": 0.46,\n        \"change\": 0.09\n      }\n    },\n    \"breakdown\": [\n      {\n        \"user\": {\n          \"id\": \"usr-abc123\",\n          \"name\": \"Adrien Gaucher\",\n          \"email\": \"adrien@company.com\"\n        },\n        \"calls\": {\n          \"value\": 673,\n          \"change\": -0.05\n        },\n        \"talk_time_seconds\": {\n          \"value\": 38460,\n          \"change\": -0.11\n        },\n        \"calls_over_1_min\": {\n          \"value\": 141,\n          \"change\": -0.1\n        },\n        \"answer_rate\": {\n          \"value\": 0.645,\n          \"change\": -0.03\n        }\n      }\n    ],\n    \"last_updated\": \"2026-04-21T19:07:00Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8d8b472d-afa1-47d8-9c5a-fdf23ee2b481",
+              "name": "Invalid request parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "overview"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"user_ids\": [\n    \"usr-abc123\",\n    \"usr-def456\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "36714c1c-a5b3-4419-960d-fc6108550101",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "overview"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"user_ids\": [\n    \"usr-abc123\",\n    \"usr-def456\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7427b46e-0272-4572-ad53-19d525ab423d",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "overview"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"user_ids\": [\n    \"usr-abc123\",\n    \"usr-def456\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d9b66f23-ef1b-41e7-86ae-d4f8c29bc644",
+          "name": "Outbound metrics",
+          "request": {
+            "name": "Outbound metrics",
+            "description": {
+              "content": "Returns outbound call metrics: dial funnel (dials → connected → conversations → conversions), time series, heatmap, leaderboard, and time spent metrics.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "analytics",
+                "outbound"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": {\n    \"from\": \"<date>\",\n    \"to\": \"<date>\"\n  },\n  \"compare_date\": {\n    \"from\": \"<date>\",\n    \"to\": \"<date>\"\n  },\n  \"user_ids\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"allo_numbers\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"granularity\": \"DAY\",\n  \"extend\": \"<string>\",\n  \"stage\": \"<string>\",\n  \"page\": 1,\n  \"size\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "385c03f0-4982-40db-b12e-b0922e55a358",
+              "name": "Outbound analytics",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "outbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"tags\": [\n    \"meeting_booked\"\n  ],\n  \"granularity\": \"DAY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"date\": {\n      \"from\": \"2026-03-25\",\n      \"to\": \"2026-04-21\"\n    },\n    \"compare_date\": {\n      \"from\": \"2026-03-25\",\n      \"to\": \"2026-04-21\"\n    },\n    \"funnel\": {\n      \"dials\": {\n        \"count\": {\n          \"value\": 5492.098817903015,\n          \"previous\": 5118.561189780563,\n          \"change\": 6791.2547578256035\n        },\n        \"rate\": 4438.414941941592\n      },\n      \"connected\": {\n        \"count\": {\n          \"value\": 3132.457149125298,\n          \"previous\": 4058.532002059015,\n          \"change\": 3548.5345762480792\n        },\n        \"rate\": 8726.123183213316\n      },\n      \"conversations\": {\n        \"count\": {\n          \"value\": 9210.028583541629,\n          \"previous\": 1700.358036211782,\n          \"change\": 5986.774590293235\n        },\n        \"rate\": 1594.4128745651465\n      },\n      \"conversions\": {\n        \"count\": {\n          \"value\": 6828.831671549364,\n          \"previous\": 267.38423952650356,\n          \"change\": 1257.2037074522068\n        },\n        \"rate\": 9234.484066703402\n      }\n    },\n    \"time_series\": {\n      \"dials\": [\n        {\n          \"date\": \"1988-10-18\",\n          \"value\": 2702.2625248825184\n        },\n        {\n          \"date\": \"1950-09-12\",\n          \"value\": 9942.954770608521\n        }\n      ],\n      \"connected\": [\n        {\n          \"date\": \"1993-05-10\",\n          \"value\": 3580.273144506516\n        },\n        {\n          \"date\": \"1965-12-11\",\n          \"value\": 5494.442163009593\n        }\n      ],\n      \"connection_rate\": [\n        {\n          \"date\": \"2006-02-02\",\n          \"value\": 9175.39827127478\n        },\n        {\n          \"date\": \"1989-12-18\",\n          \"value\": 3428.5068103513495\n        }\n      ],\n      \"conversions\": [\n        {\n          \"date\": \"1981-07-04\",\n          \"value\": 154.78076309543343\n        },\n        {\n          \"date\": \"1990-10-23\",\n          \"value\": 8061.875507101354\n        }\n      ]\n    },\n    \"heatmap\": {\n      \"dials\": [\n        {\n          \"day\": \"MONDAY\",\n          \"hour\": 3437,\n          \"value\": 1979\n        },\n        {\n          \"day\": \"WEDNESDAY\",\n          \"hour\": 1661,\n          \"value\": 8291\n        }\n      ],\n      \"connected\": [\n        {\n          \"day\": \"SATURDAY\",\n          \"hour\": 5853,\n          \"value\": 9606\n        },\n        {\n          \"day\": \"SATURDAY\",\n          \"hour\": 9441,\n          \"value\": 4559\n        }\n      ],\n      \"connection_rate\": [\n        {\n          \"day\": \"FRIDAY\",\n          \"hour\": 9162,\n          \"value\": 9603\n        },\n        {\n          \"day\": \"THURSDAY\",\n          \"hour\": 5630,\n          \"value\": 4609\n        }\n      ]\n    },\n    \"leaderboard\": [\n      {\n        \"user\": {\n          \"id\": \"usr-abc123\",\n          \"name\": \"John\",\n          \"email\": \"john@acme.com\"\n        },\n        \"connected\": 937\n      },\n      {\n        \"user\": {\n          \"id\": \"usr-abc123\",\n          \"name\": \"John\",\n          \"email\": \"john@acme.com\"\n        },\n        \"connected\": 9329\n      }\n    ],\n    \"time_spent\": {\n      \"avg_ringing_time_seconds\": {\n        \"value\": 3941.7840373157333,\n        \"previous\": 8762.136816283746,\n        \"change\": 473.5112888167481\n      },\n      \"avg_conversation_time_seconds\": {\n        \"value\": 3042.5380724781794,\n        \"previous\": 832.763093726635,\n        \"change\": 9796.459868088392\n      },\n      \"total_conversation_time_seconds\": {\n        \"value\": 744.4422803743312,\n        \"previous\": 9549.483051589785,\n        \"change\": 4205.247182488771\n      }\n    },\n    \"last_updated\": \"1964-12-20T20:14:16.322Z\",\n    \"items\": {\n      \"data\": [\n        {\n          \"id\": \"cll-abc123\",\n          \"user\": {\n            \"id\": \"usr-abc123\",\n            \"name\": \"John\",\n            \"email\": \"john@acme.com\"\n          },\n          \"allo_number\": \"+14155550100\",\n          \"allo_number_label\": \"Sales US\",\n          \"contact_number\": \"+14155551234\",\n          \"stage\": \"DIAL\",\n          \"voicemail\": true,\n          \"duration\": 3047,\n          \"date\": \"1973-05-20T04:05:21.527Z\"\n        },\n        {\n          \"id\": \"cll-abc123\",\n          \"user\": {\n            \"id\": \"usr-abc123\",\n            \"name\": \"John\",\n            \"email\": \"john@acme.com\"\n          },\n          \"allo_number\": \"+14155550100\",\n          \"allo_number_label\": \"Sales US\",\n          \"contact_number\": \"+14155551234\",\n          \"stage\": \"CONNECTED\",\n          \"voicemail\": false,\n          \"duration\": 6584,\n          \"date\": \"1964-06-18T17:07:09.508Z\"\n        }\n      ],\n      \"pagination\": {\n        \"page\": 1245,\n        \"size\": 8711,\n        \"total_count\": 4013,\n        \"total_pages\": 6674,\n        \"has_more\": false\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dad6d221-4781-4f57-ac4c-b24e520ed940",
+              "name": "Invalid request parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "outbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"tags\": [\n    \"meeting_booked\"\n  ],\n  \"granularity\": \"DAY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "71a467d9-5246-46ac-b27d-6a7676f4e3c8",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "outbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"tags\": [\n    \"meeting_booked\"\n  ],\n  \"granularity\": \"DAY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "91270795-103e-46f7-97dd-216de8090ef4",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "analytics",
+                    "outbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": {\n    \"from\": \"2026-03-25\",\n    \"to\": \"2026-04-21\"\n  },\n  \"compare_date\": {\n    \"from\": \"2026-02-25\",\n    \"to\": \"2026-03-24\"\n  },\n  \"tags\": [\n    \"meeting_booked\"\n  ],\n  \"granularity\": \"DAY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": true,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9424\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.withallo.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "5e95c756-f131-4c26-9d8a-8a45d7a2dd8d",
+    "name": "Allo Analytics API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.\n\nAll requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.\n\nContact Support:\n Name: Allo Support",
+      "type": "text/plain"
+    }
+  }
+}

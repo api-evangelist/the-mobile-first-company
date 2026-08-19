@@ -1,0 +1,164 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Allo Analytics Summary Templates API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Summary Templates",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Set number default summary template",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.withallo.com/v2/api/numbers/:number/default_summary_template",
+            "params": [
+              {
+                "name": "number",
+                "value": "",
+                "type": "path",
+                "description": "Allo phone number in E.164 format"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Sets or clears the default summary template used for a phone number's call summaries. Pass `summary_template_id` to set it, or null/omit to clear it."
+        },
+        {
+          "info": {
+            "name": "List summary templates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v2/api/summary_templates",
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns the team's call summary templates."
+        },
+        {
+          "info": {
+            "name": "Create summary template",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v2/api/summary_templates",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates a call summary template for the team."
+        },
+        {
+          "info": {
+            "name": "Get summary template",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v2/api/summary_templates/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Summary template ID (`tst-*`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns a single call summary template by ID."
+        },
+        {
+          "info": {
+            "name": "Update summary template",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.withallo.com/v2/api/summary_templates/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Summary template ID (`tst-*`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Replaces a summary template's name, call context, icon, and sections."
+        },
+        {
+          "info": {
+            "name": "Delete summary template",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.withallo.com/v2/api/summary_templates/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Summary template ID (`tst-*`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Soft-deletes (deactivates) a summary template."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

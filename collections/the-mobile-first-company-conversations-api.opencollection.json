@@ -1,0 +1,246 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Allo Analytics Conversations API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Conversations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Search Conversations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v1/api/contact/:contact_id/conversation",
+            "params": [
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the contact (e.g., \"cnt_abc123\")"
+              },
+              {
+                "name": "size",
+                "value": "",
+                "type": "query",
+                "description": "Number of results per page. Must be between 1 and 100."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number (0-indexed)."
+              },
+              {
+                "name": "allo_number",
+                "value": "",
+                "type": "query",
+                "description": "Filter conversations by a specific Allo phone number (E.164 format)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Search calls and SMS for a specific contact. Returns paginated results including call recordings, transcripts, AI summaries, and text messages."
+        },
+        {
+          "info": {
+            "name": "List conversations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v2/api/conversations",
+            "params": [
+              {
+                "name": "allo_number",
+                "value": "",
+                "type": "query",
+                "description": "Filter by Allo number (E.164). Required — list your numbers with GET /v2/api/numbers to find the right one."
+              },
+              {
+                "name": "last_activity_since",
+                "value": "",
+                "type": "query",
+                "description": "Only return conversations with activity after this timestamp (ISO 8601). Ideal for incremental sync."
+              },
+              {
+                "name": "unread",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number (1-indexed)"
+              },
+              {
+                "name": "size",
+                "value": "",
+                "type": "query",
+                "description": "Results per page"
+              },
+              {
+                "name": "extend",
+                "value": "",
+                "type": "query",
+                "description": "Comma-separated optional fields. Supported: `transcript`"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns a paginated list of conversations grouped by contact phone number, sorted by most recent activity."
+        },
+        {
+          "info": {
+            "name": "Search all conversations",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v2/api/conversations/items/search",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Search and filter items across all conversations. Supports keyword search across transcripts, summaries, and message content."
+        },
+        {
+          "info": {
+            "name": "Get conversation item",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v2/api/conversations/items/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Item ID (`cll-*` for calls, `msg-*` for messages)"
+              },
+              {
+                "name": "extend",
+                "value": "",
+                "type": "query",
+                "description": "Comma-separated optional fields. Supported: `transcript`"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns a single call or SMS message by its ID."
+        },
+        {
+          "info": {
+            "name": "Update call summary",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.withallo.com/v2/api/conversations/items/:id/summary",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Call ID (`cll-*`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Replace the markdown content of a call's AI-generated summary.\n\nOnly call items have summaries — passing an SMS ID (`msg-*`) returns `400 INVALID_ITEM_ID`. If multiple completed summary templates exist on the same call, set `template_key` to disambiguate."
+        },
+        {
+          "info": {
+            "name": "Get many conversation items",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.withallo.com/v2/api/conversations/items/batch",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns multiple conversation items by their IDs in a single request. Use this to fetch full details (summary, tags, recording, etc.) for items returned by the analytics drilldown or any other list."
+        },
+        {
+          "info": {
+            "name": "Execute conversation action",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.withallo.com/v2/api/conversations/:contact_number/action",
+            "params": [
+              {
+                "name": "contact_number",
+                "value": "",
+                "type": "path",
+                "description": "The external phone number in E.164 format. URL-encode the `+` as `%2B`."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Execute an action on a conversation."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

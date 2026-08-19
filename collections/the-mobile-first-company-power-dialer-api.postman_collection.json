@@ -1,0 +1,1861 @@
+{
+  "item": [
+    {
+      "id": "32cb593e-9bd2-4692-bb03-d5e38834c5cc",
+      "name": "Power Dialer",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d6e0844b-5aa2-4662-ab60-7ff9b2c928e0",
+          "name": "List current queue numbers",
+          "request": {
+            "name": "List current queue numbers",
+            "description": {
+              "content": "Returns the numbers in the Power Dialer queue currently assigned to the authenticated user, paginated and ordered by `position` ascending. `data` is the list of numbers (use `page`/`size` and read `pagination` to page through them); the `queue` key carries the queue's metadata (id, name, settings) without its numbers. To target a teammate's queue, pass either `user_id` or `email` as a query parameter (`user_id` wins when both are sent); the target must belong to the same team as the API key owner. When the user has no queue, the response is `200` with an empty `data` array, a zeroed `pagination`, and no `queue` (not a `404`).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "dialing-queues",
+                "current"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "user_id",
+                  "value": "<string>",
+                  "description": "ID of a teammate to read the queue for. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided."
+                },
+                {
+                  "disabled": false,
+                  "key": "email",
+                  "value": "<email>",
+                  "description": "Email of a teammate to read the queue for. Ignored when `user_id` is also supplied."
+                },
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "1",
+                  "description": "1-indexed page number for the queue's `numbers`."
+                },
+                {
+                  "disabled": false,
+                  "key": "size",
+                  "value": "20",
+                  "description": "Number of `numbers` per page (max 100)."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "871d3ab2-7e76-4564-9e82-f7b82e767dc6",
+              "name": "A page of the current queue's numbers, ordered by position. Empty `data` array with zeroed `pagination` when the user has no queue.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"number_to\": \"+12125550010\",\n      \"position\": 0,\n      \"created_at\": \"2026-04-30T10:00:00\",\n      \"updated_at\": \"2026-04-30T10:00:00\",\n      \"call_start_date\": null,\n      \"call_id\": null,\n      \"routing_result\": null,\n      \"sync_status\": \"NOT_SYNCED\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"size\": 20,\n    \"total_count\": 137,\n    \"total_pages\": 7,\n    \"has_more\": true\n  },\n  \"queue\": {\n    \"id\": \"pdl_2xGh7kLmNpQr\",\n    \"name\": \"My Queue\",\n    \"creator_id\": \"usr_abc123\",\n    \"assignee_id\": \"usr_abc123\",\n    \"voicemail_handling\": \"NO_SKIP\",\n    \"do_not_disturb\": \"DISABLED\",\n    \"created_at\": \"2026-04-30T10:00:00\",\n    \"updated_at\": \"2026-04-30T10:00:00\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ca227325-8c71-4513-9226-c0ff3234bf85",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1d597ab4-4dac-428c-a379-90aa9906c104",
+              "name": "Assignee not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": \"ASSIGNEE_NOT_FOUND\",\n    \"message\": \"No team member found for the provided 'user_id' or 'email'.\",\n    \"retryable\": false,\n    \"suggestion\": \"List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2afeb67f-c6d1-49ed-ba26-2f9eb1a2d418",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "84a65e92-683f-4b19-9c0d-032cb01fe2b7",
+          "name": "Reset current queue",
+          "request": {
+            "name": "Reset current queue",
+            "description": {
+              "content": "Creates a fresh, empty queue assigned to the authenticated user. Any older queue with the same assignee stops being returned by `GET /current` (the newest queue wins). Send `user_id` or `email` to create the queue for a teammate instead — the API key owner is recorded as `creator_id`, the teammate as `assignee_id`. `user_id` wins when both are provided.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "dialing-queues",
+                "current"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"user_id\": \"<string>\",\n  \"email\": \"<email>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f36e3433-9b70-437e-85e0-a8be7812c84a",
+              "name": "The newly created (empty) queue",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Monday cold calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"pdl_2xGh7kLmNpQr\",\n    \"name\": \"Monday cold calls\",\n    \"creator_id\": \"usr_abc123\",\n    \"assignee_id\": \"usr_abc123\",\n    \"voicemail_handling\": \"NO_SKIP\",\n    \"do_not_disturb\": \"DISABLED\",\n    \"numbers\": [],\n    \"created_at\": \"2026-05-06T10:00:00\",\n    \"updated_at\": \"2026-05-06T10:00:00\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eadc3d97-615a-45b9-aa20-df4c30f27ac6",
+              "name": "Invalid request parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Monday cold calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "70434f35-3838-4020-b4f5-5741fda19ee8",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Monday cold calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5ac8e292-7719-46b2-9f63-225f46597b18",
+              "name": "Authenticated user or assignee not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Monday cold calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": \"USER_NOT_FOUND\",\n    \"message\": \"User not found.\",\n    \"retryable\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f3813b02-117c-4b5f-9789-2d6f3c78f1aa",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Monday cold calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "82a7372a-ac04-4660-9db6-aa0a75913cc7",
+          "name": "Upsert current queue",
+          "request": {
+            "name": "Upsert current queue",
+            "description": {
+              "content": "Creates or updates the config of the queue assigned to the authenticated user. Send `user_id` or `email` to act on a teammate's queue instead — `user_id` wins when both are provided.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "dialing-queues",
+                "current"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"voicemail_handling\": \"<string>\",\n  \"do_not_disturb\": \"<string>\",\n  \"user_id\": \"<string>\",\n  \"email\": \"<email>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1c75d797-5f77-4881-922b-60ab25fd31f3",
+              "name": "Updated queue",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cold Calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"creator_id\": \"string\",\n    \"assignee_id\": \"string\",\n    \"voicemail_handling\": \"SKIP\",\n    \"do_not_disturb\": \"ENABLED\",\n    \"numbers\": [\n      {\n        \"number_to\": \"string\",\n        \"position\": 6458,\n        \"created_at\": \"1976-01-27T09:33:47.104Z\",\n        \"updated_at\": \"1970-02-10T03:55:51.154Z\",\n        \"call_start_date\": \"2019-01-13T14:13:47.331Z\",\n        \"call_id\": \"string\",\n        \"routing_result\": \"BLOCKED\",\n        \"sync_status\": \"PROCESSING\",\n        \"detected_outbound_voicemail\": false,\n        \"not_reached_destination_reason\": \"BUSY\",\n        \"voicemail_left\": true\n      },\n      {\n        \"number_to\": \"string\",\n        \"position\": 8797,\n        \"created_at\": \"1975-09-15T14:00:49.810Z\",\n        \"updated_at\": \"2004-12-27T10:04:39.263Z\",\n        \"call_start_date\": \"1971-11-16T21:49:32.744Z\",\n        \"call_id\": \"string\",\n        \"routing_result\": \"VOICEMAIL\",\n        \"sync_status\": \"NOT_SYNCED\",\n        \"detected_outbound_voicemail\": false,\n        \"not_reached_destination_reason\": \"RING_TIMEOUT\",\n        \"voicemail_left\": false\n      }\n    ],\n    \"created_at\": \"1962-08-23T01:52:31.693Z\",\n    \"updated_at\": \"2014-08-13T08:53:24.048Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dae6dc3d-d385-438e-8f24-7f86eda79af9",
+              "name": "Invalid request parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cold Calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8465635b-6293-4984-9bec-a16c14895477",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cold Calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "56a3e5c3-fb70-4e98-a8e6-9f0709b97994",
+              "name": "Assignee not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cold Calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": \"ASSIGNEE_NOT_FOUND\",\n    \"message\": \"No team member found for the provided 'user_id' or 'email'.\",\n    \"retryable\": false,\n    \"suggestion\": \"List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f229fbfa-077f-4466-b89b-8eff7b9562f6",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cold Calls\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b259a493-238a-4adb-8cb0-7fe868a37f14",
+          "name": "Append numbers to queue",
+          "request": {
+            "name": "Append numbers to queue",
+            "description": {
+              "content": "Appends phone numbers to the Power Dialer queue assigned to the authenticated user. Creates the queue implicitly if none exists. Send `user_id` or `email` to append to a teammate's queue — if that teammate has no current queue, one is created with the API key owner as `creator_id` and the teammate as `assignee_id`. `user_id` wins when both are provided.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "dialing-queues",
+                "current",
+                "numbers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"<string>\",\n      \"name\": \"<string>\",\n      \"last_name\": \"<string>\",\n      \"company\": \"<string>\",\n      \"website\": \"<string>\",\n      \"job_title\": \"<string>\",\n      \"emails\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"addresses\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"user_id\": \"<string>\",\n  \"email\": \"<email>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "9fddbf12-0c48-426f-b40e-8ee8bb6d522f",
+              "name": "Numbers appended",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"added\": [\n      {\n        \"number_to\": \"+12125550010\",\n        \"position\": 0,\n        \"created_at\": \"2026-04-30T10:00:00\",\n        \"updated_at\": \"2026-04-30T10:00:00\"\n      },\n      {\n        \"number_to\": \"+33612345678\",\n        \"position\": 1,\n        \"created_at\": \"2026-04-30T10:00:00\",\n        \"updated_at\": \"2026-04-30T10:00:00\"\n      }\n    ],\n    \"skipped\": []\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "78424237-aac5-41c2-b4a8-b8ebb8249cd4",
+              "name": "Queue limit reached or validation error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"validation_error\",\n    \"code\": \"DIALING_QUEUE_LIMIT_REACHED\",\n    \"message\": \"The dialing queue cannot exceed 1,000 numbers.\",\n    \"retryable\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f6a84cc7-de4f-45a1-a73b-f1e39ba36cf9",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5fad7159-6b55-4a26-b894-beaef2719b30",
+              "name": "Assignee not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": \"ASSIGNEE_NOT_FOUND\",\n    \"message\": \"No team member found for the provided 'user_id' or 'email'.\",\n    \"retryable\": false,\n    \"suggestion\": \"List your teammates with GET /v2/api/users and use one of their ids as 'user_id', or pass a team-member email.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "25a36739-5be6-442d-a5f8-261647c1ac96",
+              "name": "Concurrent append conflict",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"conflict_error\",\n    \"code\": \"DIALING_QUEUE_APPEND_CONFLICT\",\n    \"message\": \"A concurrent append to this queue caused a position conflict.\",\n    \"retryable\": false,\n    \"suggestion\": \"Retry the request — the conflict resolves on the next attempt.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "106d2824-9fcd-49fb-9621-a6163dd6e438",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numbers\": [\n    {\n      \"number\": \"+1 (212) 555-0010\",\n      \"name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"company\": \"Acme Inc\",\n      \"job_title\": \"Sales Manager\",\n      \"emails\": [\n        \"john.doe@acme.com\"\n      ],\n      \"website\": \"https://acme.com\"\n    },\n    {\n      \"number\": \"+33 6 12 34 56 78\",\n      \"name\": \"Marie\",\n      \"last_name\": \"Dupont\",\n      \"company\": \"Acme Inc\"\n    },\n    {\n      \"number\": \"+44 20 7946 0958\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c76be2ad-ff1c-47e6-bb84-fcb0bca51b8c",
+          "name": "Clear queue numbers",
+          "request": {
+            "name": "Clear queue numbers",
+            "description": {
+              "content": "Removes numbers from the queue assigned to the authenticated user. Exactly one filter must be supplied via query string: `number` (E.164), `position` (0-based index), `number` + `position` together (delete a specific occurrence of a duplicate), or `unassigned=true` (remove every entry that has not been called yet). Combining `unassigned` with `number` or `position` is rejected. Pass `user_id` or `email` to clear a teammate's queue instead — `user_id` wins when both are provided.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "api",
+                "dialing-queues",
+                "current",
+                "numbers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "number",
+                  "value": "<string>",
+                  "description": "Phone number to remove (any format — normalized to E.164). Removes every entry matching this number unless `position` is also supplied."
+                },
+                {
+                  "disabled": false,
+                  "key": "position",
+                  "value": "<integer>",
+                  "description": "0-based position to remove. Combine with `number` to disambiguate when the same number appears more than once."
+                },
+                {
+                  "disabled": false,
+                  "key": "unassigned",
+                  "value": "<boolean>",
+                  "description": "When `true`, removes every queue entry that has not been called yet. Cannot be combined with `number` or `position`."
+                },
+                {
+                  "disabled": false,
+                  "key": "user_id",
+                  "value": "<string>",
+                  "description": "ID of a teammate whose queue to clear. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users). Wins over `email` when both are provided."
+                },
+                {
+                  "disabled": false,
+                  "key": "email",
+                  "value": "<email>",
+                  "description": "Email of a teammate whose queue to clear. Ignored when `user_id` is also supplied."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "6553bcdd-f0d3-46e6-a0a7-abcefd3e2dc7",
+              "name": "Numbers removed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "number",
+                      "value": "+12125550010"
+                    },
+                    {
+                      "key": "position",
+                      "value": "3"
+                    },
+                    {
+                      "key": "unassigned",
+                      "value": "true"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"removed\": 4\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "190ac27a-f8b6-4e9e-894b-06e7f533e8c8",
+              "name": "Filter missing or conflicting",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "number",
+                      "value": "+12125550010"
+                    },
+                    {
+                      "key": "position",
+                      "value": "3"
+                    },
+                    {
+                      "key": "unassigned",
+                      "value": "true"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"validation_error\",\n    \"code\": \"DIALING_QUEUE_DELETE_FILTER_REQUIRED\",\n    \"message\": \"Provide at least one of 'number', 'position', or 'unassigned=true' to clear queue numbers.\",\n    \"retryable\": false,\n    \"suggestion\": \"Add 'number', 'position', or 'unassigned=true' as a query parameter.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b8d8f70a-e98c-44a1-b106-2987a7149c27",
+              "name": "Invalid or missing API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "number",
+                      "value": "+12125550010"
+                    },
+                    {
+                      "key": "position",
+                      "value": "3"
+                    },
+                    {
+                      "key": "unassigned",
+                      "value": "true"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f28e64ef-3929-4581-98fc-422e8f9a826a",
+              "name": "Queue or position not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "number",
+                      "value": "+12125550010"
+                    },
+                    {
+                      "key": "position",
+                      "value": "3"
+                    },
+                    {
+                      "key": "unassigned",
+                      "value": "true"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": \"DIALING_QUEUE_NOT_FOUND\",\n    \"message\": \"No dialing queue found for the authenticated user.\",\n    \"retryable\": false,\n    \"suggestion\": \"Create a queue by appending numbers with POST /v2/api/dialing-queues/current/numbers.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dc373220-d9f8-4821-a248-8bbb68c216e6",
+              "name": "Rate limit exceeded",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "api",
+                    "dialing-queues",
+                    "current",
+                    "numbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "number",
+                      "value": "+12125550010"
+                    },
+                    {
+                      "key": "position",
+                      "value": "3"
+                    },
+                    {
+                      "key": "unassigned",
+                      "value": "true"
+                    },
+                    {
+                      "key": "user_id",
+                      "value": "usr-15BB68317A7F06F0C07A3BBD8F244102A6872220"
+                    },
+                    {
+                      "key": "email",
+                      "value": "teammate@acme.com"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"code\": \"string\",\n    \"message\": \"string\",\n    \"retryable\": false,\n    \"request_id\": \"string\",\n    \"retry_after_seconds\": 9881\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.withallo.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "383e8e16-5a33-4929-b011-f2e493fb1b78",
+    "name": "Allo Analytics Power Dialer API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.\n\nAll requests to `/v1/api/**` endpoints automatically go through quota checking and scope validation.\n\nContact Support:\n Name: Allo Support",
+      "type": "text/plain"
+    }
+  }
+}

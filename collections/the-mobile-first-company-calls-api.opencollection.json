@@ -1,0 +1,61 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Allo Analytics Calls API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Calls",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Search Calls",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.withallo.com/v1/api/calls",
+            "params": [
+              {
+                "name": "size",
+                "value": "",
+                "type": "query",
+                "description": "Number of results per page. Must be between 1 and 100."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number (0-indexed)."
+              },
+              {
+                "name": "allo_number",
+                "value": "",
+                "type": "query",
+                "description": "Your Allo phone number to filter calls by. Must be in E.164 format (e.g., `+1234567890`)."
+              },
+              {
+                "name": "contact_number",
+                "value": "",
+                "type": "query",
+                "description": "Filter calls by contact phone number. Only returns calls with this specific contact. Must be in E.164 format (e.g., `+1234567890`)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Search and filter calls for a specific Allo phone number with pagination support."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
