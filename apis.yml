@@ -36,6 +36,17 @@ created: '2026-07-17'
 modified: '2026-07-21'
 tags:
 - Company
+- Communications
+- Telephony
+- Voice
+- SMS
+- CRM
+- Artificial Intelligence
+- MCP
+- Webhook
+- Small Business
+tags_raw:
+- Company
 - Communication
 - Telephony
 - Voice
@@ -215,6 +226,8 @@ apis:
   humanURL: https://help.withallo.com/en/api-reference/introduction
   baseURL: https://api.withallo.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -231,6 +244,8 @@ apis:
   humanURL: https://help.withallo.com/en/api-reference/introduction
   baseURL: https://api.withallo.com
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
