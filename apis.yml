@@ -10,6 +10,18 @@ description: >-
   webhooks), a hosted Model Context Protocol (MCP) server, and OAuth 2.0. Sibling
   apps Due (invoicing) and Claim (expenses) extend the same approach. The company
   is backed by Base10 Partners and Lightspeed Venture Partners.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
