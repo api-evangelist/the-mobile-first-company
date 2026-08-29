@@ -1,0 +1,37 @@
+slug: the-mobile-first-company
+provider: The Mobile First Company
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Telecommunications
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 2
+edges:
+- tag: CRM
+  spec_file: the-mobile-first-company-crm-api-openapi.yml
+  capability_id: BC-420
+  capability_id_l1: BC-420
+  capability_name: Customer Relationship Management
+  confidence: 0.75
+  evidence: POST /v2/api/crm/people createPerson; POST /v2/api/crm/companies createCompany; POST /v2/api/crm/deals
+    createDeal; schemas CrmPerson, CrmCompany, CrmDeal
+  reason: Explicit CRM object model of people, companies and deals with create/update/search — customer
+    relationship management. L2 left null because the surface spans customer records (customer data) and
+    deals (sales pipeline) roughly equally.
+- tag: Contacts
+  spec_file: the-mobile-first-company-contacts-api-openapi.yml
+  capability_id: BC-420.10
+  capability_id_l1: BC-420
+  capability_name: Customer Data Management
+  confidence: 0.7
+  evidence: POST /v1/api/contacts createContact Create Contact; PUT /v1/api/contacts/{contact_id} updateContact;
+    schema ContactWithEngagementApiResponse
+  reason: Create, update and search of contact records with engagement context — maintenance of the customer
+    contact record. Moderate-high confidence; it is a lightweight contact store rather than a full golden-record
+    MDM.

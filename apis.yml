@@ -267,6 +267,9 @@ apis:
   - type: APIReference
     url: https://help.withallo.com/en/v2/api-reference/introduction
 common:
+- type: CapabilityMap
+  url: capabilities/the-mobile-first-company-capability-edges.yml
+  name: The Mobile First Company Business Capability Map
 - type: DomainSecurity
   url: security/the-mobile-first-company-domain-security.yml
 - type: Authentication
