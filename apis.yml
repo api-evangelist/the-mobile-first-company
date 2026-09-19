@@ -152,6 +152,8 @@ apis:
   humanURL: https://help.withallo.com/en/api-reference/introduction
   baseURL: https://api.withallo.com
   tags:
+  - Partners
+  tags_raw:
   - Partner
   properties:
   - type: OpenAPI
