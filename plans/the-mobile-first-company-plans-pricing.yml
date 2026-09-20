@@ -10,6 +10,11 @@ provenance:
   grounding: every price_text was found verbatim in the fetched page text
 audience: business-product
 pricing_basis: per-seat
+delivery:
+  delivery: managed
+  method: page
+  read: '2026-09-20'
+  managed_tier: Solo
 published: true
 note: Tier card prices are rendered as scrambled digit reels in the visible text; numeric prices were
   taken from the FAQ section ($10/$32/$100 per user per month annual; $45/$120 monthly). Annual billing
