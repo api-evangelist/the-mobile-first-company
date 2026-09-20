@@ -269,6 +269,8 @@ apis:
   - type: APIReference
     url: https://help.withallo.com/en/v2/api-reference/introduction
 common:
+- type: RateLimits
+  url: rate-limits/the-mobile-first-company-rate-limits.yml
 - type: Plans
   url: plans/the-mobile-first-company-plans-pricing.yml
 - type: CapabilityMap

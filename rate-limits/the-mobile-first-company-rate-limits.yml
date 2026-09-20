@@ -1,0 +1,32 @@
+# Rate limits transcribed from the provider's own documentation — see provenance. Quoted, not derived.
+generated: '2026-09-20'
+method: searched
+source: https://help.withallo.com/en/v2/api-reference/guides/rate-limits
+sources:
+- https://help.withallo.com/en/v2/api-reference/guides/rate-limits
+provenance:
+  tool: planning/api-economics/harvest_ratelimits.py
+  run: 20260920T133210
+  grounding: every limit_text was found verbatim in the fetched page text
+published: true
+note: Per-second limits applied per API key.
+limit_count: 2
+limits:
+- name: Read requests (GET)
+  limit_text: 20 requests/second
+  limit: 20
+  window: second
+  scope: api-key
+  endpoint: Read requests (GET)
+- name: Write requests
+  limit_text: 5 requests/second
+  limit: 5
+  window: second
+  scope: api-key
+  endpoint: Write requests (POST, PUT, PATCH, DELETE)
+headers:
+- X-RateLimit-Limit
+- X-RateLimit-Remaining
+- X-RateLimit-Reset
+- Retry-After
+exceeded_status: 429
