@@ -1,0 +1,92 @@
+# Pricing transcribed from the provider's own page — see provenance. Numbers are quoted, not derived.
+generated: '2026-09-20'
+method: searched
+source: https://www.withallo.com/pricing
+sources:
+- https://www.withallo.com/pricing
+provenance:
+  tool: planning/api-economics/harvest_pricing.py
+  run: 20260920T120546
+  grounding: every price_text was found verbatim in the fetched page text
+audience: business-product
+pricing_basis: per-seat
+published: true
+note: Tier card prices are rendered as scrambled digit reels in the visible text; numeric prices were
+  taken from the FAQ section ($10/$32/$100 per user per month annual; $45/$120 monthly). Annual billing
+  advertised as 'Save 29 %'. 7-day free trial, no setup fees or contracts.
+plan_count: 10
+currency: USD
+plans:
+- name: Solo
+  price_text: $10/user/month
+  price: 10
+  currency: USD
+  period: month
+  unit: per user
+  included_quota: 1 business number, unlimited national calls, call recording, receive SMS, AI summaries
+    and transcripts, email support; billed yearly, one user
+- name: Business
+  price_text: $32/user/month
+  price: 32
+  currency: USD
+  period: month
+  unit: per user
+  included_quota: Everything in Solo plus unlimited users with a number each, CRM sync, send SMS (US included),
+    AI call tags, analytics, priority support; $5 of SMS credit per seat per month
+  overage: sending outside US uses credits, pay as you go
+- name: Business (monthly billing)
+  price_text: $45 monthly
+  price: 45
+  currency: USD
+  period: month
+  unit: per user
+- name: Ultra
+  price_text: $100/user/month
+  price: 100
+  currency: USD
+  period: month
+  unit: per user
+  included_quota: Everything in Business plus AI agents, custom dashboards, custom AI voice, Slack support,
+    dedicated account manager, SLA
+- name: Ultra (monthly billing)
+  price_text: $120 monthly
+  price: 120
+  currency: USD
+  period: month
+  unit: per user
+- name: Power Dialer add-on
+  price_text: $50 /month for the whole team
+  price: 50
+  currency: USD
+  period: month
+  unit: per team
+  included_quota: Billed yearly; import contacts, auto-skip voicemail, calls recorded/transcribed/tagged
+- name: Additional phone number
+  price_text: From $5 /month per number
+  price: 5
+  currency: USD
+  period: month
+  unit: per number
+  included_quota: Number in 80+ countries, free porting
+- name: AI Receptionist add-on
+  price_text: /month per agent
+  currency: USD
+  period: month
+  unit: per agent
+  included_quota: Costs the same as a Business seat (takes one additional Business seat)
+- name: A2P 10DLC registration
+  price_text: $24 one-time
+  price: 24
+  currency: USD
+  period: one-time
+  unit: registration
+  included_quota: Required for sending to US and Canadian numbers
+- name: HIPAA Business Associate Agreement
+  price_text: add $50 a month per workspace
+  price: 50
+  currency: USD
+  period: month
+  unit: per workspace
+rate_limit_statements:
+- Unlimited national calls
+- Inbound SMS Unlimited

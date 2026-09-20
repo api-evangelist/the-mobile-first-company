@@ -269,6 +269,8 @@ apis:
   - type: APIReference
     url: https://help.withallo.com/en/v2/api-reference/introduction
 common:
+- type: Plans
+  url: plans/the-mobile-first-company-plans-pricing.yml
 - type: CapabilityMap
   url: capabilities/the-mobile-first-company-capability-edges.yml
   name: The Mobile First Company Business Capability Map
