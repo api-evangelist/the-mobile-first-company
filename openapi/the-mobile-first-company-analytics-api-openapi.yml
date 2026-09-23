@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
   title: Allo Analytics API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
@@ -231,8 +231,9 @@ paths:
                         format: date-time
                         description: When the metrics were last updated
                       items:
-                        type: object
-                        nullable: true
+                        type:
+                        - object
+                        - 'null'
                         description: Drilldown call list. Only present when extend=items is set.
                         properties:
                           data:
@@ -249,6 +250,83 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
+    MetricValue:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Current period value
+        previous:
+          type:
+          - number
+          - 'null'
+          description: Previous period value
+        change:
+          type:
+          - number
+          - 'null'
+          description: Percentage change vs previous period (e.g. 0.15 = +15%)
+    TimeSeriesPoint:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        value:
+          type: number
+    FunnelStage:
+      type: object
+      properties:
+        count:
+          $ref: '#/components/schemas/MetricValue'
+        rate:
+          type:
+          - number
+          - 'null'
+          description: Percentage of total dials (e.g. 0.29 = 29%)
+    UserBreakdown:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserRef'
+        calls:
+          $ref: '#/components/schemas/MetricValue'
+        talk_time_seconds:
+          $ref: '#/components/schemas/MetricValue'
+        calls_over_1_min:
+          $ref: '#/components/schemas/MetricValue'
+        answer_rate:
+          $ref: '#/components/schemas/MetricValue'
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    HeatmapCell:
+      type: object
+      properties:
+        day:
+          type: string
+          enum:
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          - SUNDAY
+        hour:
+          type: integer
+          description: Hour of day (0-23)
+        value:
+          type: integer
     AnalyticsBaseRequest:
       type: object
       required:
@@ -269,6 +347,22 @@ components:
           items:
             type: string
           description: Filter by Allo numbers (E.164). Cannot be combined with user_ids.
+    AnalyticsDateRange:
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date
+          description: Start date
+          example: '2026-03-25'
+        to:
+          type: string
+          format: date
+          description: End date
+          example: '2026-04-21'
     OutboundDrilldownItem:
       type: object
       properties:
@@ -302,50 +396,19 @@ components:
         date:
           type: string
           format: date-time
-    MetricValue:
+    Pagination:
       type: object
       properties:
-        value:
-          type: number
-          description: Current period value
-        previous:
-          type: number
-          nullable: true
-          description: Previous period value
-        change:
-          type: number
-          nullable: true
-          description: Percentage change vs previous period (e.g. 0.15 = +15%)
-    FunnelStage:
-      type: object
-      properties:
-        count:
-          $ref: '#/components/schemas/MetricValue'
-        rate:
-          type: number
-          nullable: true
-          description: Percentage of total dials (e.g. 0.29 = 29%)
-    TimeSeriesPoint:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        value:
-          type: number
-    UserBreakdown:
-      type: object
-      properties:
-        user:
-          $ref: '#/components/schemas/UserRef'
-        calls:
-          $ref: '#/components/schemas/MetricValue'
-        talk_time_seconds:
-          $ref: '#/components/schemas/MetricValue'
-        calls_over_1_min:
-          $ref: '#/components/schemas/MetricValue'
-        answer_rate:
-          $ref: '#/components/schemas/MetricValue'
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
     OutboundAnalyticsRequest:
       allOf:
       - $ref: '#/components/schemas/AnalyticsBaseRequest'
@@ -386,65 +449,6 @@ components:
             default: 20
             maximum: 100
             description: Page size for drilldown items. Only used when `extend=items`.
-    HeatmapCell:
-      type: object
-      properties:
-        day:
-          type: string
-          enum:
-          - MONDAY
-          - TUESDAY
-          - WEDNESDAY
-          - THURSDAY
-          - FRIDAY
-          - SATURDAY
-          - SUNDAY
-        hour:
-          type: integer
-          description: Hour of day (0-23)
-        value:
-          type: integer
-    UserRef:
-      type: object
-      properties:
-        id:
-          type: string
-          example: usr-abc123
-        name:
-          type: string
-          example: John
-        email:
-          type: string
-          example: john@acme.com
-    AnalyticsDateRange:
-      type: object
-      required:
-      - from
-      - to
-      properties:
-        from:
-          type: string
-          format: date
-          description: Start date
-          example: '2026-03-25'
-        to:
-          type: string
-          format: date
-          description: End date
-          example: '2026-04-21'
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        size:
-          type: integer
-        total_count:
-          type: integer
-        total_pages:
-          type: integer
-        has_more:
-          type: boolean
     ApiError:
       type: object
       properties:
@@ -462,17 +466,18 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
+              type:
+              - integer
+              - 'null'
   responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
+    ApiValidationError:
+      description: Invalid request parameters
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
+    ApiUnauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:

@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Power Dialer API
+  title: Allo Power Dialer API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -498,69 +498,25 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
-  responses:
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
-    ClearQueueNumbersResponse:
+    PaginatedResponse:
       type: object
-      description: Result of clearing numbers from a Power Dialer queue.
       properties:
-        removed:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        page:
           type: integer
-          description: Number of queue entries that were removed.
-          example: 4
-    UpsertDialingQueueRequest:
-      type: object
-      description: Creates or updates the queue config. All fields are optional — only the fields you supply are touched. Pass `user_id` or `email` to act on a teammate's queue instead.
-      properties:
-        name:
-          type: string
-          nullable: true
-          description: New queue name (1–255 characters)
-          minLength: 1
-          maxLength: 255
-        voicemail_handling:
-          type: string
-          nullable: true
-          enum:
-          - SKIP
-          - NO_SKIP
-          description: How the Power Dialer reacts when the call hits voicemail.
-        do_not_disturb:
-          type: string
-          nullable: true
-          enum:
-          - ENABLED
-          - DISABLED
-          description: Silence inbound calls while running the queue.
-        user_id:
-          type: string
-          nullable: true
-          description: Optional. ID of a teammate whose queue config should be updated. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
-          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
-        email:
-          type: string
-          format: email
-          nullable: true
-          description: Optional. Email of a teammate whose queue config should be updated. Ignored when `user_id` is also supplied.
-          example: teammate@acme.com
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
     AppendQueueNumbersResponse:
       type: object
       properties:
@@ -583,189 +539,44 @@ components:
                 enum:
                 - INVALID_PHONE_NUMBER
                 description: Why the number was skipped
-    QueueNumber:
+    DialingQueueMeta:
       type: object
-      description: A phone number entry in a Power Dialer queue
+      description: Power Dialer queue metadata, without its numbers. Returned under the `queue` key of `GET /current`; the numbers themselves are the paginated `data`.
       properties:
-        number_to:
+        id:
           type: string
-          description: E.164 destination phone number
-        position:
-          type: integer
-          description: Order within the queue (0-based)
+          description: Unique queue identifier (KSUID with `pdl` prefix)
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name of the queue
+        creator_id:
+          type: string
+          description: User ID of the queue creator.
+        assignee_id:
+          type:
+          - string
+          - 'null'
+          description: User ID of the user expected to run the queue.
+        voicemail_handling:
+          type: string
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call lands in voicemail.
+        do_not_disturb:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-        call_start_date:
-          type: string
-          format: date-time
-          nullable: true
-          description: When the user started calling this entry. `null` if the entry is still unassigned.
-        call_id:
-          type: string
-          nullable: true
-          description: ID of the call placed for this entry (`cll-*`). `null` until a call is placed.
-        routing_result:
-          type: string
-          nullable: true
-          enum:
-          - FAILED
-          - RECEIVED
-          - BLOCKED
-          - ANSWERED
-          - TRANSFERRED_BLAND
-          - TRANSFERRED_ELEVEN_LABS
-          - TRANSFERRED_EXTERNAL
-          - FAILED_EXTERNAL
-          - VOICEMAIL
-          - CLOSED
-          description: Final routing outcome of the call placed for this entry.
-        sync_status:
-          type: string
-          enum:
-          - NOT_SYNCED
-          - PROCESSING
-          - SYNCED
-          description: State of contact creation/sync for this entry.
-        detected_outbound_voicemail:
-          type: boolean
-          nullable: true
-          description: Whether the call was detected as having reached a voicemail box.
-        not_reached_destination_reason:
-          type: string
-          nullable: true
-          enum:
-          - BUSY
-          - CALLEE_TEMPORARILY_UNAVAILABLE
-          - RING_TIMEOUT
-          - NOT_IN_SERVICE
-          - DECLINED
-          - NETWORK_ERROR
-          description: Why the call did not reach the contact (only set when applicable).
-        voicemail_left:
-          type: boolean
-          nullable: true
-          description: Whether the user left a voicemail on this entry.
-    PaginatedResponse:
-      type: object
-      properties:
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    AppendQueueNumbersRequest:
-      type: object
-      required:
-      - numbers
-      properties:
-        numbers:
-          type: array
-          description: Numbers to append to the queue. Each entry requires a phone number; contact metadata is optional.
-          minItems: 1
-          items:
-            type: object
-            required:
-            - number
-            properties:
-              number:
-                type: string
-                description: Phone number in any format — will be normalized to E.164
-              name:
-                type: string
-                nullable: true
-                description: First name (optional — used to create or match a contact)
-              last_name:
-                type: string
-                nullable: true
-                description: Last name
-              company:
-                type: string
-                nullable: true
-                description: Company name — matched by name within the team (case-insensitive). If no matching company exists, one is created automatically.
-              website:
-                type: string
-                nullable: true
-                description: Website URL
-              job_title:
-                type: string
-                nullable: true
-                description: Job title
-              emails:
-                type: array
-                nullable: true
-                items:
-                  type: string
-                description: Email addresses
-              addresses:
-                type: array
-                nullable: true
-                items:
-                  type: string
-                description: Physical addresses
-        user_id:
-          type: string
-          nullable: true
-          description: Optional. ID of a teammate whose queue should receive the numbers. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users).
-          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
-        email:
-          type: string
-          format: email
-          nullable: true
-          description: Optional. Email of a teammate whose queue should receive the numbers. Ignored when `user_id` is also supplied.
-          example: teammate@acme.com
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        size:
-          type: integer
-        total_count:
-          type: integer
-        total_pages:
-          type: integer
-        has_more:
-          type: boolean
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type: integer
-              nullable: true
-    ResetDialingQueueRequest:
-      type: object
-      description: Optional payload for resetting a queue. Send an empty body to reset your own queue without renaming.
-      properties:
-        name:
-          type: string
-          nullable: true
-          description: Display name for the new queue (max 255 characters). Leave unset to create the queue without a name.
-          maxLength: 255
-        user_id:
-          type: string
-          nullable: true
-          description: Optional. ID of a teammate the new queue should be assigned to. The API key owner is recorded as `creator_id`. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
-          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
-        email:
-          type: string
-          format: email
-          nullable: true
-          description: Optional. Email of a teammate the new queue should be assigned to. Ignored when `user_id` is also supplied.
-          example: teammate@acme.com
     DialingQueue:
       type: object
       description: A user's Power Dialer queue with its configuration and numbers.
@@ -774,15 +585,17 @@ components:
           type: string
           description: Unique queue identifier (KSUID with `pdl` prefix)
         name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Display name of the queue
         creator_id:
           type: string
           description: User ID of the queue creator — the user (or API key owner) that created the queue.
         assignee_id:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: User ID of the user expected to run the queue. `GET /current` returns the queue where this matches the authenticated user (or the user resolved from `user_id` / `email`). Defaults to the creator when none was specified at creation time.
         voicemail_handling:
           type: string
@@ -806,42 +619,257 @@ components:
         updated_at:
           type: string
           format: date-time
-    DialingQueueMeta:
+    ClearQueueNumbersResponse:
       type: object
-      description: Power Dialer queue metadata, without its numbers. Returned under the `queue` key of `GET /current`; the numbers themselves are the paginated `data`.
+      description: Result of clearing numbers from a Power Dialer queue.
       properties:
-        id:
-          type: string
-          description: Unique queue identifier (KSUID with `pdl` prefix)
+        removed:
+          type: integer
+          description: Number of queue entries that were removed.
+          example: 4
+    ResetDialingQueueRequest:
+      type: object
+      description: Optional payload for resetting a queue. Send an empty body to reset your own queue without renaming.
+      properties:
         name:
+          type:
+          - string
+          - 'null'
+          description: Display name for the new queue (max 255 characters). Leave unset to create the queue without a name.
+          maxLength: 255
+        user_id:
+          type:
+          - string
+          - 'null'
+          description: Optional. ID of a teammate the new queue should be assigned to. The API key owner is recorded as `creator_id`. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Optional. Email of a teammate the new queue should be assigned to. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    AppendQueueNumbersRequest:
+      type: object
+      required:
+      - numbers
+      properties:
+        numbers:
+          type: array
+          description: Numbers to append to the queue. Each entry requires a phone number; contact metadata is optional.
+          minItems: 1
+          items:
+            type: object
+            required:
+            - number
+            properties:
+              number:
+                type: string
+                description: Phone number in any format — will be normalized to E.164
+              name:
+                type:
+                - string
+                - 'null'
+                description: First name (optional — used to create or match a contact)
+              last_name:
+                type:
+                - string
+                - 'null'
+                description: Last name
+              company:
+                type:
+                - string
+                - 'null'
+                description: Company name — matched by name within the team (case-insensitive). If no matching company exists, one is created automatically.
+              website:
+                type:
+                - string
+                - 'null'
+                description: Website URL
+              job_title:
+                type:
+                - string
+                - 'null'
+                description: Job title
+              emails:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: string
+                description: Email addresses
+              addresses:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: string
+                description: Physical addresses
+        user_id:
+          type:
+          - string
+          - 'null'
+          description: Optional. ID of a teammate whose queue should receive the numbers. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided. Resolve teammate ids via [GET /v2/api/users](/en/v2/api-reference/users/list-users).
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Optional. Email of a teammate whose queue should receive the numbers. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    QueueNumber:
+      type: object
+      description: A phone number entry in a Power Dialer queue
+      properties:
+        number_to:
           type: string
-          nullable: true
-          description: Display name of the queue
-        creator_id:
-          type: string
-          description: User ID of the queue creator.
-        assignee_id:
-          type: string
-          nullable: true
-          description: User ID of the user expected to run the queue.
-        voicemail_handling:
-          type: string
-          enum:
-          - SKIP
-          - NO_SKIP
-          description: How the Power Dialer reacts when the call lands in voicemail.
-        do_not_disturb:
-          type: string
-          enum:
-          - ENABLED
-          - DISABLED
-          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
+          description: E.164 destination phone number
+        position:
+          type: integer
+          description: Order within the queue (0-based)
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
+        call_start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the user started calling this entry. `null` if the entry is still unassigned.
+        call_id:
+          type:
+          - string
+          - 'null'
+          description: ID of the call placed for this entry (`cll-*`). `null` until a call is placed.
+        routing_result:
+          type:
+          - string
+          - 'null'
+          enum:
+          - FAILED
+          - RECEIVED
+          - BLOCKED
+          - ANSWERED
+          - TRANSFERRED_BLAND
+          - TRANSFERRED_ELEVEN_LABS
+          - TRANSFERRED_EXTERNAL
+          - FAILED_EXTERNAL
+          - VOICEMAIL
+          - CLOSED
+          description: Final routing outcome of the call placed for this entry.
+        sync_status:
+          type: string
+          enum:
+          - NOT_SYNCED
+          - PROCESSING
+          - SYNCED
+          description: State of contact creation/sync for this entry.
+        detected_outbound_voicemail:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the call was detected as having reached a voicemail box.
+        not_reached_destination_reason:
+          type:
+          - string
+          - 'null'
+          enum:
+          - BUSY
+          - CALLEE_TEMPORARILY_UNAVAILABLE
+          - RING_TIMEOUT
+          - NOT_IN_SERVICE
+          - DECLINED
+          - NETWORK_ERROR
+          description: Why the call did not reach the contact (only set when applicable).
+        voicemail_left:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the user left a voicemail on this entry.
+    UpsertDialingQueueRequest:
+      type: object
+      description: Creates or updates the queue config. All fields are optional — only the fields you supply are touched. Pass `user_id` or `email` to act on a teammate's queue instead.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: New queue name (1–255 characters)
+          minLength: 1
+          maxLength: 255
+        voicemail_handling:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call hits voicemail.
+        do_not_disturb:
+          type:
+          - string
+          - 'null'
+          enum:
+          - ENABLED
+          - DISABLED
+          description: Silence inbound calls while running the queue.
+        user_id:
+          type:
+          - string
+          - 'null'
+          description: Optional. ID of a teammate whose queue config should be updated. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Optional. Email of a teammate whose queue config should be updated. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
+  responses:
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   securitySchemes:
     CallsAuth:
       type: apiKey

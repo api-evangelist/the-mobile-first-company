@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics CRM API
+  title: Allo CRM API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -507,68 +507,6 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
-    CrmCompany:
-      type: object
-      description: A company in the CRM
-      properties:
-        id:
-          type: string
-          description: Unique company identifier
-          example: com-xyz789
-        name:
-          type: string
-          description: Company name
-          example: Acme Corp
-        website:
-          type: string
-          nullable: true
-          description: Company website URL
-          example: https://acme.com
-        industry:
-          type: string
-          nullable: true
-          description: Industry sector
-          example: Technology
-        person_count:
-          type: integer
-          description: Number of people linked to this company
-          example: 3
-        interactions:
-          type: integer
-          description: Total number of interactions across all people in this company
-          example: 12
-        last_activity_at:
-          type: string
-          format: date-time
-          nullable: true
-          description: Timestamp of the last activity
-          example: '2026-04-28T10:30:00'
-        created_at:
-          type: string
-          format: date-time
-          description: When the company was created
-          example: '2026-04-01T09:00:00'
-        updated_at:
-          type: string
-          format: date-time
-          description: When the company was last updated
-          example: '2026-04-28T10:30:00'
-    UpdateCompanyRequest:
-      type: object
-      description: Request body for updating a company. Only provided fields will be updated.
-      properties:
-        name:
-          type: string
-          nullable: true
-          description: Company name
-        website:
-          type: string
-          nullable: true
-          description: Company website URL
-        industry:
-          type: string
-          nullable: true
-          description: Industry sector
     CreateCompanyRequest:
       type: object
       description: Request body for creating a company
@@ -580,65 +518,81 @@ components:
           description: Company name
           example: Acme Corp
         website:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Company website URL
           example: https://acme.com
         industry:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Industry sector
           example: Technology
-    UpdateDealRequest:
+    PaginatedResponse:
       type: object
-      description: Request body for updating a deal. Only provided fields will be updated.
       properties:
-        name:
-          type: string
-          nullable: true
-          description: Deal name
-        status:
-          type: string
-          nullable: true
-          description: Deal status
-        amount:
-          type: number
-          nullable: true
-          description: Deal monetary value
-        currency:
-          type: string
-          nullable: true
-          description: Three-letter ISO 4217 currency code
-          minLength: 3
-          maxLength: 3
-        closed_at:
-          type: string
-          nullable: true
-          description: When the deal was closed (ISO 8601)
-        company_id:
-          type: string
-          nullable: true
-          description: ID of the company to associate with
-    CrmCompanyRef:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    CrmDeal:
       type: object
-      nullable: true
-      description: Embedded company reference
+      description: A deal in the CRM
       properties:
         id:
           type: string
-          description: Company ID
-          example: com-xyz789
+          description: Unique deal identifier
+          example: dea-def456
         name:
           type: string
-          description: Company name
-          example: Acme Corp
+          description: Deal name
+          example: Enterprise Plan
+        status:
+          type:
+          - string
+          - 'null'
+          description: Current deal status
+          example: negotiation
+        amount:
+          type:
+          - number
+          - 'null'
+          description: Deal monetary value
+          example: 50000
+        currency:
+          type:
+          - string
+          - 'null'
+          description: Three-letter ISO 4217 currency code
+          example: USD
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the deal was closed (ISO 8601)
+          example: null
+        company:
+          $ref: '#/components/schemas/CrmCompanyRef'
+        created_at:
+          type: string
+          format: date-time
+          description: When the deal was created
+          example: '2026-04-15T14:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the deal was last updated
+          example: '2026-04-28T10:30:00'
     SearchPeopleRequest:
       type: object
       description: Request body for searching people
       properties:
         filters:
-          type: object
-          nullable: true
+          type:
+          - object
+          - 'null'
           description: Named filters. All are combined with AND.
           properties:
             name:
@@ -666,12 +620,14 @@ components:
               type: string
               description: Filter by deal status (exact match)
         search:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Free-text search across name, email, phone number, and company
         sort:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           enum:
           - DATE_DESC
           - DATE_ASC
@@ -689,85 +645,48 @@ components:
           default: 20
           maximum: 100
           description: Results per page
-    PaginatedResponse:
+    CreateDealRequest:
       type: object
+      description: Request body for creating a deal
+      required:
+      - name
       properties:
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    SearchDealsRequest:
-      type: object
-      description: Request body for searching deals
-      properties:
-        filters:
-          type: object
-          nullable: true
-          description: Named filters. Combined with AND.
-          properties:
-            stage:
-              type: string
-              description: Filter by deal stage/status (exact match)
-        search:
+        name:
           type: string
-          nullable: true
-          description: Free-text search across deal name and company
-        sort:
-          type: string
-          nullable: true
-          enum:
-          - DATE_DESC
-          - DATE_ASC
-          - NAME_ASC
-          - NAME_DESC
-          - CREATED_DESC
-          - CREATED_ASC
-          description: 'Sort order (default: DATE_DESC)'
-        page:
-          type: integer
-          default: 1
-          description: Page number (1-indexed)
-        size:
-          type: integer
-          default: 20
-          maximum: 100
-          description: Results per page
-    SearchCompaniesRequest:
-      type: object
-      description: Request body for searching companies
-      properties:
-        filters:
-          type: object
-          nullable: true
-          description: Named filters. All are combined with AND.
-          properties:
-            name:
-              type: string
-              description: Filter by company name (contains)
-            website:
-              type: string
-              description: Filter by website (contains)
-            industry:
-              type: string
-              description: Filter by industry (contains)
-        sort:
-          type: string
-          nullable: true
-          enum:
-          - DATE_DESC
-          - DATE_ASC
-          - NAME_ASC
-          - NAME_DESC
-          - CREATED_DESC
-          - CREATED_ASC
-          description: 'Sort order (default: DATE_DESC)'
-        page:
-          type: integer
-          default: 1
-          description: Page number (1-indexed)
-        size:
-          type: integer
-          default: 20
-          maximum: 100
-          description: Results per page
+          description: Deal name
+          example: Enterprise Plan
+        status:
+          type:
+          - string
+          - 'null'
+          description: Deal status
+          example: negotiation
+        amount:
+          type:
+          - number
+          - 'null'
+          description: Deal monetary value
+          example: 50000
+        currency:
+          type:
+          - string
+          - 'null'
+          description: Three-letter ISO 4217 currency code
+          example: USD
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type:
+          - string
+          - 'null'
+          description: When the deal was closed (ISO 8601)
+          example: '2026-04-28T12:00:00'
+        company_id:
+          type:
+          - string
+          - 'null'
+          description: ID of the company to associate with
+          example: com-xyz789
     CrmPerson:
       type: object
       description: A person in the CRM
@@ -777,28 +696,33 @@ components:
           description: Unique person identifier
           example: per-abc123
         name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: First name
           example: John
         last_name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Last name
           example: Doe
         job_title:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Job title
           example: CEO
         website:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Website URL
           example: https://example.com
         address:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Postal address
           example: 123 Main St
         numbers:
@@ -822,9 +746,10 @@ components:
           description: Total number of interactions (calls + messages)
           example: 5
         last_activity_at:
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
-          nullable: true
           description: Timestamp of the last activity
           example: '2026-04-28T10:30:00'
         created_at:
@@ -837,199 +762,45 @@ components:
           format: date-time
           description: When the person was last updated
           example: '2026-04-28T10:30:00'
-    CreateDealRequest:
+    SearchDealsRequest:
       type: object
-      description: Request body for creating a deal
-      required:
-      - name
+      description: Request body for searching deals
       properties:
-        name:
-          type: string
-          description: Deal name
-          example: Enterprise Plan
-        status:
-          type: string
-          nullable: true
-          description: Deal status
-          example: negotiation
-        amount:
-          type: number
-          nullable: true
-          description: Deal monetary value
-          example: 50000
-        currency:
-          type: string
-          nullable: true
-          description: Three-letter ISO 4217 currency code
-          example: USD
-          minLength: 3
-          maxLength: 3
-        closed_at:
-          type: string
-          nullable: true
-          description: When the deal was closed (ISO 8601)
-          example: '2026-04-28T12:00:00'
-        company_id:
-          type: string
-          nullable: true
-          description: ID of the company to associate with
-          example: com-xyz789
-    CrmDeal:
-      type: object
-      description: A deal in the CRM
-      properties:
-        id:
-          type: string
-          description: Unique deal identifier
-          example: dea-def456
-        name:
-          type: string
-          description: Deal name
-          example: Enterprise Plan
-        status:
-          type: string
-          nullable: true
-          description: Current deal status
-          example: negotiation
-        amount:
-          type: number
-          nullable: true
-          description: Deal monetary value
-          example: 50000
-        currency:
-          type: string
-          nullable: true
-          description: Three-letter ISO 4217 currency code
-          example: USD
-          minLength: 3
-          maxLength: 3
-        closed_at:
-          type: string
-          format: date-time
-          nullable: true
-          description: When the deal was closed (ISO 8601)
-          example: null
-        company:
-          $ref: '#/components/schemas/CrmCompanyRef'
-        created_at:
-          type: string
-          format: date-time
-          description: When the deal was created
-          example: '2026-04-15T14:00:00'
-        updated_at:
-          type: string
-          format: date-time
-          description: When the deal was last updated
-          example: '2026-04-28T10:30:00'
-    UpdatePersonRequest:
-      type: object
-      description: Request body for updating a person. Only provided fields will be updated.
-      properties:
-        name:
-          type: string
-          nullable: true
-          description: First name
-        last_name:
-          type: string
-          nullable: true
-          description: Last name
-        job_title:
-          type: string
-          nullable: true
-          description: Job title
-        website:
-          type: string
-          nullable: true
-          description: Website URL
-        address:
-          type: string
-          nullable: true
-          description: Postal address
-        numbers:
-          type: array
-          nullable: true
-          items:
-            type: string
-          description: Phone numbers (replaces all existing numbers)
-        emails:
-          type: array
-          nullable: true
-          items:
-            type: string
-          description: Email addresses (replaces all existing emails)
-        company_id:
-          type: string
-          nullable: true
-          description: ID of the company to associate with
-    CreatePersonRequest:
-      type: object
-      description: Request body for creating a person
-      required:
-      - numbers
-      properties:
-        name:
-          type: string
-          nullable: true
-          description: First name
-          example: John
-        last_name:
-          type: string
-          nullable: true
-          description: Last name
-          example: Doe
-        job_title:
-          type: string
-          nullable: true
-          description: Job title
-          example: CEO
-        website:
-          type: string
-          nullable: true
-          description: Website URL
-          example: https://example.com
-        address:
-          type: string
-          nullable: true
-          description: Postal address
-          example: 123 Main St
-        numbers:
-          type: array
-          items:
-            type: string
-          description: Phone numbers in E.164 format. At least one number is required.
-          minItems: 1
-          example:
-          - '+33612345678'
-        emails:
-          type: array
-          nullable: true
-          items:
-            type: string
-          description: Email addresses
-          example:
-          - john@example.com
-        company_id:
-          type: string
-          nullable: true
-          description: ID of the company to associate with
-          example: com-xyz789
-        allow_duplicate_number:
-          type: boolean
-          description: When true, allows creating a person even if the phone numbers are already assigned to another person. Defaults to false.
-          default: false
-    Pagination:
-      type: object
-      properties:
+        filters:
+          type:
+          - object
+          - 'null'
+          description: Named filters. Combined with AND.
+          properties:
+            stage:
+              type: string
+              description: Filter by deal stage/status (exact match)
+        search:
+          type:
+          - string
+          - 'null'
+          description: Free-text search across deal name and company
+        sort:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - NAME_ASC
+          - NAME_DESC
+          - CREATED_DESC
+          - CREATED_ASC
+          description: 'Sort order (default: DATE_DESC)'
         page:
           type: integer
+          default: 1
+          description: Page number (1-indexed)
         size:
           type: integer
-        total_count:
-          type: integer
-        total_pages:
-          type: integer
-        has_more:
-          type: boolean
+          default: 20
+          maximum: 100
+          description: Results per page
     ApiError:
       type: object
       properties:
@@ -1047,9 +818,298 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
+              type:
+              - integer
+              - 'null'
+    CrmCompany:
+      type: object
+      description: A company in the CRM
+      properties:
+        id:
+          type: string
+          description: Unique company identifier
+          example: com-xyz789
+        name:
+          type: string
+          description: Company name
+          example: Acme Corp
+        website:
+          type:
+          - string
+          - 'null'
+          description: Company website URL
+          example: https://acme.com
+        industry:
+          type:
+          - string
+          - 'null'
+          description: Industry sector
+          example: Technology
+        person_count:
+          type: integer
+          description: Number of people linked to this company
+          example: 3
+        interactions:
+          type: integer
+          description: Total number of interactions across all people in this company
+          example: 12
+        last_activity_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp of the last activity
+          example: '2026-04-28T10:30:00'
+        created_at:
+          type: string
+          format: date-time
+          description: When the company was created
+          example: '2026-04-01T09:00:00'
+        updated_at:
+          type: string
+          format: date-time
+          description: When the company was last updated
+          example: '2026-04-28T10:30:00'
+    SearchCompaniesRequest:
+      type: object
+      description: Request body for searching companies
+      properties:
+        filters:
+          type:
+          - object
+          - 'null'
+          description: Named filters. All are combined with AND.
+          properties:
+            name:
+              type: string
+              description: Filter by company name (contains)
+            website:
+              type: string
+              description: Filter by website (contains)
+            industry:
+              type: string
+              description: Filter by industry (contains)
+        sort:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - NAME_ASC
+          - NAME_DESC
+          - CREATED_DESC
+          - CREATED_ASC
+          description: 'Sort order (default: DATE_DESC)'
+        page:
+          type: integer
+          default: 1
+          description: Page number (1-indexed)
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+          description: Results per page
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    UpdateDealRequest:
+      type: object
+      description: Request body for updating a deal. Only provided fields will be updated.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: Deal name
+        status:
+          type:
+          - string
+          - 'null'
+          description: Deal status
+        amount:
+          type:
+          - number
+          - 'null'
+          description: Deal monetary value
+        currency:
+          type:
+          - string
+          - 'null'
+          description: Three-letter ISO 4217 currency code
+          minLength: 3
+          maxLength: 3
+        closed_at:
+          type:
+          - string
+          - 'null'
+          description: When the deal was closed (ISO 8601)
+        company_id:
+          type:
+          - string
+          - 'null'
+          description: ID of the company to associate with
+    CreatePersonRequest:
+      type: object
+      description: Request body for creating a person
+      required:
+      - numbers
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: First name
+          example: John
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Last name
+          example: Doe
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title
+          example: CEO
+        website:
+          type:
+          - string
+          - 'null'
+          description: Website URL
+          example: https://example.com
+        address:
+          type:
+          - string
+          - 'null'
+          description: Postal address
+          example: 123 Main St
+        numbers:
+          type: array
+          items:
+            type: string
+          description: Phone numbers in E.164 format. At least one number is required.
+          minItems: 1
+          example:
+          - '+33612345678'
+        emails:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Email addresses
+          example:
+          - john@example.com
+        company_id:
+          type:
+          - string
+          - 'null'
+          description: ID of the company to associate with
+          example: com-xyz789
+        allow_duplicate_number:
+          type: boolean
+          description: When true, allows creating a person even if the phone numbers are already assigned to another person. Defaults to false.
+          default: false
+    UpdateCompanyRequest:
+      type: object
+      description: Request body for updating a company. Only provided fields will be updated.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: Company name
+        website:
+          type:
+          - string
+          - 'null'
+          description: Company website URL
+        industry:
+          type:
+          - string
+          - 'null'
+          description: Industry sector
+    UpdatePersonRequest:
+      type: object
+      description: Request body for updating a person. Only provided fields will be updated.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: First name
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Last name
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title
+        website:
+          type:
+          - string
+          - 'null'
+          description: Website URL
+        address:
+          type:
+          - string
+          - 'null'
+          description: Postal address
+        numbers:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Phone numbers (replaces all existing numbers)
+        emails:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Email addresses (replaces all existing emails)
+        company_id:
+          type:
+          - string
+          - 'null'
+          description: ID of the company to associate with
+    CrmCompanyRef:
+      type:
+      - object
+      - 'null'
+      description: Embedded company reference
+      properties:
+        id:
+          type: string
+          description: Company ID
+          example: com-xyz789
+        name:
+          type: string
+          description: Company name
+          example: Acme Corp
   responses:
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
     ApiConflict:
       description: Conflict with existing resource
       content:
@@ -1062,20 +1122,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
     ApiValidationError:
       description: Invalid request parameters
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
+    ApiRateLimited:
+      description: Rate limit exceeded
       content:
         application/json:
           schema:

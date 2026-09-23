@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics SMS API
+  title: Allo SMS API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -155,39 +155,67 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
-  responses:
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
   schemas:
+    SendSMSResponse:
+      type: object
+      description: Standard response wrapper for sent SMS
+      properties:
+        data:
+          $ref: '#/components/schemas/TextMessageApiResponse'
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+    TextMessageApiResponse:
+      type: object
+      description: Sent SMS message details
+      properties:
+        from_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number that sent the message. Null when sender_id is used instead.
+          example: '+1234567890'
+        sender_id:
+          type:
+          - string
+          - 'null'
+          description: Sender ID used for the message (alphanumeric identifier). Only populated when sending with a verified Sender ID (e.g., for France SMS). Null when from_number is used.
+          example: MyCompany
+        to_number:
+          type: string
+          description: Phone number that received the message
+          example: +0987654321
+        type:
+          type: string
+          enum:
+          - OUTBOUND
+          description: Direction of the message (always OUTBOUND for sent messages)
+        content:
+          type: string
+          description: Content of the SMS message
+          example: Hello, this is a test message
+        start_date:
+          type: string
+          format: date-time
+          description: When the message was sent
+          example: '2024-01-15T10:30:00'
     SendSMSRequest:
       type: object
       description: Request body for sending an SMS message (US)
@@ -210,24 +238,6 @@ components:
           minLength: 1
           maxLength: 1000
           example: Hello, this is a test message
-    ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error
-        details:
-          type: array
-          nullable: true
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
-    SendSMSResponse:
-      type: object
-      description: Standard response wrapper for sent SMS
-      properties:
-        data:
-          $ref: '#/components/schemas/TextMessageApiResponse'
     SendSMSFranceRequest:
       type: object
       description: Request body for sending an SMS message in France using a verified Sender ID
@@ -250,45 +260,38 @@ components:
           minLength: 1
           maxLength: 1000
           example: Bonjour, ceci est un message de test
-    TextMessageApiResponse:
-      type: object
-      description: Sent SMS message details
-      properties:
-        from_number:
-          type: string
-          nullable: true
-          description: Phone number that sent the message. Null when sender_id is used instead.
-          example: '+1234567890'
-        sender_id:
-          type: string
-          nullable: true
-          description: Sender ID used for the message (alphanumeric identifier). Only populated when sending with a verified Sender ID (e.g., for France SMS). Null when from_number is used.
-          example: MyCompany
-        to_number:
-          type: string
-          description: Phone number that received the message
-          example: +0987654321
-        type:
-          type: string
-          enum:
-          - OUTBOUND
-          description: Direction of the message (always OUTBOUND for sent messages)
-        content:
-          type: string
-          description: Content of the SMS message
-          example: Hello, this is a test message
-        start_date:
-          type: string
-          format: date-time
-          description: When the message was sent
-          example: '2024-01-15T10:30:00'
-    ErrorDetail:
-      type: object
-      properties:
-        message:
-          type: string
-        field:
-          type: string
+  responses:
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Webhooks API
+  title: Allo Webhooks API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -253,48 +253,7 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
-  responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
-    WebhookTopic:
-      type: string
-      enum:
-      - call.received
-      - call.triggered
-      - call.answered
-      - call.completed
-      - tag.added
-      - tag.removed
-      - sms.received
-      - sms.sent
-      - contact.created
-      - contact.updated
-      - summary.updated
-      description: An event topic. See the Event Catalog for payloads.
-      example: call.received
     CreateWebhookApiRequest:
       type: object
       required:
@@ -332,6 +291,22 @@ components:
         enabled:
           type: boolean
           description: Enable or disable the endpoint.
+    WebhookTopic:
+      type: string
+      enum:
+      - call.received
+      - call.triggered
+      - call.answered
+      - call.completed
+      - tag.added
+      - tag.removed
+      - sms.received
+      - sms.sent
+      - contact.created
+      - contact.updated
+      - summary.updated
+      description: An event topic. See the Event Catalog for payloads.
+      example: call.received
     WebhookApiResponse:
       type: object
       description: A webhook endpoint.
@@ -350,21 +325,33 @@ components:
             $ref: '#/components/schemas/WebhookTopic'
           description: Event topics this endpoint is subscribed to.
         description:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Optional human-readable label.
         enabled:
           type: boolean
           description: Whether the endpoint is active.
         signing_secret:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Secret used to verify delivery signatures. Returned only when the webhook is created or fetched by ID.
         created_at:
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
-          nullable: true
           description: When the endpoint was created.
+    WebhookEventTypeApiResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: call.received
+        description:
+          type: string
+          example: Inbound call received
     ApiError:
       type: object
       properties:
@@ -382,17 +369,34 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
-    WebhookEventTypeApiResponse:
-      type: object
-      properties:
-        name:
-          type: string
-          example: call.received
-        description:
-          type: string
-          example: Inbound call received
+              type:
+              - integer
+              - 'null'
+  responses:
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   securitySchemes:
     CallsAuth:
       type: apiKey

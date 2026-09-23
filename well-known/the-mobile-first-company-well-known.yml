@@ -1,36 +1,31 @@
 generated: '2026-07-21'
 method: searched
 source: live probes of Allo (withallo.com) hosts
-description: >-
-  Well-known discovery endpoints probed across the Allo API, marketing, and MCP
-  hosts. Each entry records the probed path, HTTP status, and the saved raw file
-  where a 200 was captured.
+description: Well-known discovery endpoints probed across the Allo API, marketing, and MCP hosts. Each
+  entry records the probed path, HTTP status, and the saved raw file where a 200 was captured.
 endpoints:
 - host: api.withallo.com
   path: /.well-known/oauth-authorization-server
   url: https://api.withallo.com/.well-known/oauth-authorization-server
   status: 200
   file: the-mobile-first-company-oauth-authorization-server.json
-  note: >-
-    OAuth 2.0 Authorization Server Metadata (RFC 8414). Advertises
-    authorization_code + refresh_token + client_credentials grants, PKCE S256,
-    and the full scopes_supported list used by the MCP server and API keys.
+  note: OAuth 2.0 Authorization Server Metadata (RFC 8414). Advertises authorization_code + refresh_token
+    + client_credentials grants, PKCE S256, and the full scopes_supported list used by the MCP server
+    and API keys.
 - host: mcp.withallo.com
   path: /.well-known/oauth-protected-resource
   url: https://mcp.withallo.com/.well-known/oauth-protected-resource
   status: 200
   file: the-mobile-first-company-oauth-protected-resource.json
-  note: >-
-    OAuth 2.0 Protected Resource Metadata (RFC 9728) for the hosted MCP server,
-    pointing at api.withallo.com as its authorization server.
+  note: OAuth 2.0 Protected Resource Metadata (RFC 9728) for the hosted MCP server, pointing at api.withallo.com
+    as its authorization server.
 - host: www.withallo.com
   path: /.well-known/api-catalog
   url: https://www.withallo.com/.well-known/api-catalog
   status: 200
   file: the-mobile-first-company-api-catalog.json
-  note: >-
-    RFC 9727 API catalog linkset anchoring api.withallo.com to its OpenAPI
-    (service-desc), HTML reference (service-doc), and llms.txt (service-meta).
+  note: RFC 9727 API catalog linkset anchoring api.withallo.com to its OpenAPI (service-desc), HTML reference
+    (service-doc), and llms.txt (service-meta).
 - host: api.withallo.com
   path: /.well-known/security.txt
   url: https://api.withallo.com/.well-known/security.txt
@@ -47,3 +42,32 @@ endpoints:
   path: /.well-known/ai-plugin.json
   url: https://api.withallo.com/.well-known/ai-plugin.json
   status: 404
+hosts:
+- host: api.withallo.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: the-mobile-first-company-oauth-authorization-server.json
+    note: OAuth 2.0 Authorization Server Metadata (RFC 8414). Advertises authorization_code + refresh_token
+      + client_credentials grants, PKCE S256, and the full scopes_supported list used by the MCP server
+      and API keys.
+    url: https://api.withallo.com/.well-known/oauth-authorization-server
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: the-mobile-first-company-oauth-protected-resource.json
+    note: OAuth 2.0 Protected Resource Metadata (RFC 9728) for the hosted MCP server, pointing at api.withallo.com
+      as its authorization server.
+    url: https://mcp.withallo.com/.well-known/oauth-protected-resource
+  - path: /.well-known/api-catalog
+    status: 200
+    file: the-mobile-first-company-api-catalog.json
+    note: RFC 9727 API catalog linkset anchoring api.withallo.com to its OpenAPI (service-desc), HTML
+      reference (service-doc), and llms.txt (service-meta).
+    url: https://www.withallo.com/.well-known/api-catalog
+x-shape-fix:
+  converted: '2026-08-20'
+  from: endpoints
+  note: Rewritten into hosts[] -> documents[], the only shape well_known_docs() in score.rb reads. A served
+    .well-known surface recorded in any other shape scores as absent. Promoted ONLY the 2xx rows out of
+    the probe log; non-2xx probes are real negative results and were left in place, not converted into
+    documents.

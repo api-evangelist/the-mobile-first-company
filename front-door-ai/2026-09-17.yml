@@ -1,0 +1,29 @@
+# Front Door AI Index — the-mobile-first-company — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: the-mobile-first-company
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: www.withallo.com
+  final_host: www.withallo.com
+  ownership: own
+  owner: the-mobile-first-company
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 24
+  host_score: 24
+  density: 11.75
+  words: 2042
+  tiers:
+    agentic: 2
+    core: 17
+    model: 5
+  ambiguous: 7
+  top_terms:
+    AI: 17
+    agent: 7
+    Claude: 5
+    AI agent: 1
+    MCP: 1

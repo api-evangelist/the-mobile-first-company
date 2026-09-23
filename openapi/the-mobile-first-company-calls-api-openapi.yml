@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Calls API
+  title: Allo Calls API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -97,6 +97,135 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
 components:
   schemas:
+    CallApiResponse:
+      type: object
+      description: A call record with details about the conversation
+      properties:
+        id:
+          type: string
+          description: Unique call identifier
+          example: call_abc123
+        from_number:
+          type: string
+          description: Phone number that initiated the call (E.164 format or 'anonymous')
+          example: '+1234567890'
+        to_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number that received the call
+          example: +0987654321
+        length_in_minutes:
+          type: number
+          format: double
+          description: Duration of the call in minutes
+          example: 5.5
+        type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - INBOUND
+          - OUTBOUND
+          description: Direction of the call
+        result:
+          type: string
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED_AI
+          - TRANSFERRED_EXTERNAL
+          - BLOCKED
+          - FAILED
+          - FAILED_EXTERNAL
+          - RECEIVED
+          - CLOSED
+          description: 'The outcome of the call. For outbound calls that reached voicemail, this will be VOICEMAIL regardless of the routing result. Common values: ANSWERED (call was answered), VOICEMAIL (call went to voicemail), TRANSFERRED_AI (transferred to AI agent), BLOCKED (call was blocked)'
+          example: ANSWERED
+        summary:
+          type:
+          - string
+          - 'null'
+          description: AI-generated summary of the call conversation
+          example: Customer inquired about order status
+        tag:
+          type:
+          - string
+          - 'null'
+          description: Tag/category assigned to the call
+          example: support
+        recording_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: URL to access the call recording
+        start_date:
+          type: string
+          format: date-time
+          description: When the call started (ISO 8601 format)
+          example: '2024-01-15T10:30:00'
+        transcript:
+          type:
+          - array
+          - 'null'
+          description: Transcript of the call conversation
+          items:
+            $ref: '#/components/schemas/TranscriptRow'
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+    TranscriptRow:
+      type: object
+      description: A single row in the call transcript
+      properties:
+        source:
+          type: string
+          enum:
+          - AGENT
+          - EXTERNAL
+          - USER
+          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
+        text:
+          type: string
+          description: The transcribed text content
+          example: Hello, how can I help you today?
+        time:
+          type: string
+          format: date-time
+          description: When this transcript entry occurred (ISO 8601 format)
+          example: '2024-01-15T10:30:15'
+        start_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Start time of this segment in seconds from call start
+          example: 15
+        end_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: End time of this segment in seconds from call start
+          example: 18.5
     SearchCallsApiResponse:
       type: object
       description: Standard response wrapper for paginated call results
@@ -120,147 +249,7 @@ components:
         current_page:
           type: integer
           example: 0
-    TranscriptRow:
-      type: object
-      description: A single row in the call transcript
-      properties:
-        source:
-          type: string
-          enum:
-          - AGENT
-          - EXTERNAL
-          - USER
-          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
-        text:
-          type: string
-          description: The transcribed text content
-          example: Hello, how can I help you today?
-        time:
-          type: string
-          format: date-time
-          description: When this transcript entry occurred (ISO 8601 format)
-          example: '2024-01-15T10:30:15'
-        start_seconds:
-          type: number
-          format: double
-          nullable: true
-          description: Start time of this segment in seconds from call start
-          example: 15
-        end_seconds:
-          type: number
-          format: double
-          nullable: true
-          description: End time of this segment in seconds from call start
-          example: 18.5
-    ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error
-        details:
-          type: array
-          nullable: true
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
-    CallApiResponse:
-      type: object
-      description: A call record with details about the conversation
-      properties:
-        id:
-          type: string
-          description: Unique call identifier
-          example: call_abc123
-        from_number:
-          type: string
-          description: Phone number that initiated the call (E.164 format or 'anonymous')
-          example: '+1234567890'
-        to_number:
-          type: string
-          nullable: true
-          description: Phone number that received the call
-          example: +0987654321
-        length_in_minutes:
-          type: number
-          format: double
-          description: Duration of the call in minutes
-          example: 5.5
-        type:
-          type: string
-          nullable: true
-          enum:
-          - INBOUND
-          - OUTBOUND
-          description: Direction of the call
-        result:
-          type: string
-          enum:
-          - ANSWERED
-          - VOICEMAIL
-          - TRANSFERRED_AI
-          - TRANSFERRED_EXTERNAL
-          - BLOCKED
-          - FAILED
-          - FAILED_EXTERNAL
-          - RECEIVED
-          - CLOSED
-          description: 'The outcome of the call. For outbound calls that reached voicemail, this will be VOICEMAIL regardless of the routing result. Common values: ANSWERED (call was answered), VOICEMAIL (call went to voicemail), TRANSFERRED_AI (transferred to AI agent), BLOCKED (call was blocked)'
-          example: ANSWERED
-        summary:
-          type: string
-          nullable: true
-          description: AI-generated summary of the call conversation
-          example: Customer inquired about order status
-        tag:
-          type: string
-          nullable: true
-          description: Tag/category assigned to the call
-          example: support
-        recording_url:
-          type: string
-          format: uri
-          nullable: true
-          description: URL to access the call recording
-        start_date:
-          type: string
-          format: date-time
-          description: When the call started (ISO 8601 format)
-          example: '2024-01-15T10:30:00'
-        transcript:
-          type: array
-          nullable: true
-          description: Transcript of the call conversation
-          items:
-            $ref: '#/components/schemas/TranscriptRow'
-    ErrorDetail:
-      type: object
-      properties:
-        message:
-          type: string
-        field:
-          type: string
   responses:
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
     Forbidden:
       description: Forbidden - API key lacks required scope
       content:
@@ -272,6 +261,26 @@ components:
             details:
             - message: required=CONTACTS_READ
               field: scope
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Summary Templates API
+  title: Allo Summary Templates API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -40,8 +40,9 @@ paths:
               type: object
               properties:
                 summary_template_id:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: Summary template ID (`tst-*`) to set as the default, or null to clear.
                   example: tst-abc123
             example:
@@ -61,8 +62,9 @@ paths:
                         type: string
                         example: '+14155551234'
                       default_summary_template_id:
-                        type: string
-                        nullable: true
+                        type:
+                        - string
+                        - 'null'
                         example: tst-abc123
               example:
                 data:
@@ -136,13 +138,15 @@ paths:
                   description: Template name.
                   example: Sales call
                 call_context:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: Background context that helps the AI summarize calls (max 4000 characters).
                   example: B2B SaaS sales calls
                 icon:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: Optional icon (e.g. an emoji).
                   example: 📞
                 sections:
@@ -271,13 +275,15 @@ paths:
                   description: Template name.
                   example: Sales call
                 call_context:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: Background context that helps the AI summarize calls (max 4000 characters).
                   example: B2B SaaS sales calls
                 icon:
-                  type: string
-                  nullable: true
+                  type:
+                  - string
+                  - 'null'
                   description: Optional icon (e.g. an emoji).
                   example: 📞
                 sections:
@@ -358,34 +364,32 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
+  responses:
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
-    SummaryTemplate:
-      type: object
-      properties:
-        id:
-          type: string
-          example: tst-abc123
-        name:
-          type: string
-          example: Sales call
-        call_context:
-          type: string
-          nullable: true
-          example: B2B SaaS sales calls
-        icon:
-          type: string
-          nullable: true
-          example: 📞
-        sections:
-          type: array
-          items:
-            $ref: '#/components/schemas/SummaryTemplateSection'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
     SummaryTemplateSection:
       type: object
       properties:
@@ -399,6 +403,35 @@ components:
           type: integer
           description: 0-based position of the section in the summary.
           example: 0
+    SummaryTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tst-abc123
+        name:
+          type: string
+          example: Sales call
+        call_context:
+          type:
+          - string
+          - 'null'
+          example: B2B SaaS sales calls
+        icon:
+          type:
+          - string
+          - 'null'
+          example: 📞
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/SummaryTemplateSection'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     ApiError:
       type: object
       properties:
@@ -416,33 +449,9 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
-  responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
+              type:
+              - integer
+              - 'null'
   securitySchemes:
     CallsAuth:
       type: apiKey

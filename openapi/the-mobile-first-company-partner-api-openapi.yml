@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Partner API
+  title: Allo Partner API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -60,8 +60,9 @@ paths:
                       description: ISO country code.
                       example: FR
                     prefix:
-                      type: string
-                      nullable: true
+                      type:
+                      - string
+                      - 'null'
                       example: '+337'
             example:
               email: client@example.com
@@ -86,8 +87,9 @@ paths:
                         type: string
                         example: usr_2Nf...
                       api_key:
-                        type: string
-                        nullable: true
+                        type:
+                        - string
+                        - 'null'
                         description: Scoped API key for the new account. Returned only on create.
                         example: b1c2...
                       phone_numbers:
@@ -104,8 +106,9 @@ paths:
                         description: True once the customer has signed in on a device.
                         example: false
                       partner_client_ref:
-                        type: string
-                        nullable: true
+                        type:
+                        - string
+                        - 'null'
                         example: crm-12345
               example:
                 data:
@@ -180,8 +183,9 @@ paths:
                         type: string
                         example: usr_2Nf...
                       api_key:
-                        type: string
-                        nullable: true
+                        type:
+                        - string
+                        - 'null'
                         description: Scoped API key for the new account. Returned only on create.
                         example: b1c2...
                       phone_numbers:
@@ -198,8 +202,9 @@ paths:
                         description: True once the customer has signed in on a device.
                         example: false
                       partner_client_ref:
-                        type: string
-                        nullable: true
+                        type:
+                        - string
+                        - 'null'
                         example: crm-12345
         '401':
           $ref: '#/components/responses/ApiUnauthorized'
@@ -281,8 +286,9 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
+              type:
+              - integer
+              - 'null'
   responses:
     ApiRateLimited:
       description: Rate limit exceeded

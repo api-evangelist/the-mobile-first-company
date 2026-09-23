@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Tags API
+  title: Allo Tags API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -126,14 +126,14 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
+    ApiNotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
+    ApiUnauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:
@@ -145,6 +145,18 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
   schemas:
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tag-abc123
+        name:
+          type: string
+          example: qualified
+        color:
+          type: string
+          example: '#00AA00'
     ApiError:
       type: object
       properties:
@@ -162,20 +174,9 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
-    Tag:
-      type: object
-      properties:
-        id:
-          type: string
-          example: tag-abc123
-        name:
-          type: string
-          example: qualified
-        color:
-          type: string
-          example: '#00AA00'
+              type:
+              - integer
+              - 'null'
   securitySchemes:
     CallsAuth:
       type: apiKey

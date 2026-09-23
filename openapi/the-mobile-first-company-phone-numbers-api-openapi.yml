@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Allo Analytics Phone Numbers API
+  title: Allo Phone Numbers API
   description: 'Allo API provides programmatic access to your Allo account, allowing you to manage webhooks, retrieve calls and contacts, and send SMS messages.
 
 
@@ -108,22 +108,58 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    GetNumbersResponse:
+      type: object
+      description: Standard response wrapper containing list of phone numbers
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneNumberApiResponse'
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
     PhoneNumber:
       type: object
       properties:
         number:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Phone number in E.164 format (null for sender IDs)
           example: '+14155550100'
         name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Display label
           example: Sales US
         country:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: ISO country code
           example: US
         type:
@@ -157,55 +193,26 @@ components:
           type: string
         field:
           type: string
-    ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error
-        details:
-          type: array
-          nullable: true
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
-    GetNumbersResponse:
-      type: object
-      description: Standard response wrapper containing list of phone numbers
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PhoneNumberApiResponse'
-    UserRef:
-      type: object
-      properties:
-        id:
-          type: string
-          example: usr-abc123
-        name:
-          type: string
-          example: John
-        email:
-          type: string
-          example: john@acme.com
     PhoneNumberApiResponse:
       type: object
       description: An Allo phone number with basic information
       properties:
         number:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Phone number in E.164 format
           example: '+1234567890'
         name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Display name for the phone number
           example: Main Line
         country:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
           description: Two-letter country code (ISO 3166-1 alpha-2)
           example: US
         is_shared_number:
@@ -228,35 +235,10 @@ components:
             request_id:
               type: string
             retry_after_seconds:
-              type: integer
-              nullable: true
+              type:
+              - integer
+              - 'null'
   responses:
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
     Forbidden:
       description: Forbidden - API key lacks required scope
       content:
@@ -268,12 +250,38 @@ components:
             details:
             - message: required=CONTACTS_READ
               field: scope
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
     ApiRateLimited:
       description: Rate limit exceeded
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

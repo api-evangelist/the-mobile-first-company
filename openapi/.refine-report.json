@@ -1,26 +1,14 @@
 {
   "provider": "the-mobile-first-company",
   "sources": [
-    "the-mobile-first-company-analytics-api-openapi.yml",
-    "the-mobile-first-company-calls-api-openapi.yml",
-    "the-mobile-first-company-contacts-api-openapi.yml",
-    "the-mobile-first-company-conversations-api-openapi.yml",
-    "the-mobile-first-company-crm-api-openapi.yml",
-    "the-mobile-first-company-partner-api-openapi.yml",
-    "the-mobile-first-company-phone-numbers-api-openapi.yml",
-    "the-mobile-first-company-power-dialer-api-openapi.yml",
-    "the-mobile-first-company-sms-api-openapi.yml",
-    "the-mobile-first-company-summary-templates-api-openapi.yml",
-    "the-mobile-first-company-tags-api-openapi.yml",
-    "the-mobile-first-company-users-api-openapi.yml",
-    "the-mobile-first-company-webhooks-api-openapi.yml"
+    "_original/the-mobile-first-company-allo-openapi.json"
   ],
   "outputs": [
     "the-mobile-first-company-analytics-api-openapi.yml",
+    "the-mobile-first-company-crm-api-openapi.yml",
     "the-mobile-first-company-calls-api-openapi.yml",
     "the-mobile-first-company-contacts-api-openapi.yml",
     "the-mobile-first-company-conversations-api-openapi.yml",
-    "the-mobile-first-company-crm-api-openapi.yml",
     "the-mobile-first-company-partner-api-openapi.yml",
     "the-mobile-first-company-phone-numbers-api-openapi.yml",
     "the-mobile-first-company-power-dialer-api-openapi.yml",
@@ -32,9 +20,32 @@
   ],
   "archived": [],
   "errors": [
-    "the-mobile-first-company-power-dialer-api-openapi.yml: dangling $ref: #/components/schemas/ApiErrorResponse"
+    "the-mobile-first-company-allo-openapi.json: dangling $ref: #/components/schemas/ApiErrorResponse"
   ],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "the-mobile-first-company-allo-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "the-mobile-first-company-allo-openapi.json: declared missing tag: Conversations",
+    "the-mobile-first-company-allo-openapi.json: declared missing tag: Partner",
+    "the-mobile-first-company-allo-openapi.json: declared missing tag: Power Dialer",
+    "the-mobile-first-company-allo-openapi.json: declared missing tag: Tags",
+    "the-mobile-first-company-allo-openapi.json: declared missing tag: Users",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "the-mobile-first-company-analytics-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-calls-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-contacts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-conversations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-crm-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-partner-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-phone-numbers-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-power-dialer-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-sms-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-summary-templates-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-tags-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "the-mobile-first-company-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
