@@ -108,6 +108,39 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
+    GetNumbersResponse:
+      type: object
+      description: Standard response wrapper containing list of phone numbers
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneNumberApiResponse'
+    PhoneNumberApiResponse:
+      type: object
+      description: An Allo phone number with basic information
+      properties:
+        number:
+          type:
+          - string
+          - 'null'
+          description: Phone number in E.164 format
+          example: '+1234567890'
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name for the phone number
+          example: Main Line
+        country:
+          type:
+          - string
+          - 'null'
+          description: Two-letter country code (ISO 3166-1 alpha-2)
+          example: US
+        is_shared_number:
+          type: boolean
+          description: Whether this number is shared across team members
     UserRef:
       type: object
       properties:
@@ -120,14 +153,6 @@ components:
         email:
           type: string
           example: john@acme.com
-    GetNumbersResponse:
-      type: object
-      description: Standard response wrapper containing list of phone numbers
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PhoneNumberApiResponse'
     ErrorResponse:
       type: object
       properties:
@@ -141,6 +166,13 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
     PhoneNumber:
       type: object
       properties:
@@ -186,38 +218,6 @@ components:
           description: Team members with access to this number
           items:
             $ref: '#/components/schemas/UserRef'
-    ErrorDetail:
-      type: object
-      properties:
-        message:
-          type: string
-        field:
-          type: string
-    PhoneNumberApiResponse:
-      type: object
-      description: An Allo phone number with basic information
-      properties:
-        number:
-          type:
-          - string
-          - 'null'
-          description: Phone number in E.164 format
-          example: '+1234567890'
-        name:
-          type:
-          - string
-          - 'null'
-          description: Display name for the phone number
-          example: Main Line
-        country:
-          type:
-          - string
-          - 'null'
-          description: Two-letter country code (ISO 3166-1 alpha-2)
-          example: US
-        is_shared_number:
-          type: boolean
-          description: Whether this number is shared across team members
     ApiError:
       type: object
       properties:
@@ -250,6 +250,15 @@ components:
             details:
             - message: required=CONTACTS_READ
               field: scope
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
     ApiUnauthorized:
       description: Invalid or missing API key
       content:
@@ -273,15 +282,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

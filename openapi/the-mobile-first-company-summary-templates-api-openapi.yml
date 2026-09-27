@@ -371,12 +371,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
     ApiUnauthorized:
       description: Invalid or missing API key
       content:
@@ -389,20 +383,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
-    SummaryTemplateSection:
-      type: object
-      properties:
-        title:
-          type: string
-          example: Pain points
-        instructions:
-          type: string
-          example: List the prospect's pain points
-        order:
-          type: integer
-          description: 0-based position of the section in the summary.
-          example: 0
     SummaryTemplate:
       type: object
       properties:
@@ -432,6 +419,19 @@ components:
         updated_at:
           type: string
           format: date-time
+    SummaryTemplateSection:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Pain points
+        instructions:
+          type: string
+          example: List the prospect's pain points
+        order:
+          type: integer
+          description: 0-based position of the section in the summary.
+          example: 0
     ApiError:
       type: object
       properties:

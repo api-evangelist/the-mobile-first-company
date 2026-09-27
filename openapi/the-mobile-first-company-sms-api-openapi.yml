@@ -155,13 +155,39 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
+  responses:
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
   schemas:
-    SendSMSResponse:
-      type: object
-      description: Standard response wrapper for sent SMS
-      properties:
-        data:
-          $ref: '#/components/schemas/TextMessageApiResponse'
     ErrorResponse:
       type: object
       properties:
@@ -175,6 +201,34 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
+    SendSMSResponse:
+      type: object
+      description: Standard response wrapper for sent SMS
+      properties:
+        data:
+          $ref: '#/components/schemas/TextMessageApiResponse'
+    SendSMSFranceRequest:
+      type: object
+      description: Request body for sending an SMS message in France using a verified Sender ID
+      required:
+      - sender_id
+      - to
+      - message
+      properties:
+        sender_id:
+          type: string
+          description: Your verified Sender ID (must be verified by the Allo team). This is an alphanumeric identifier that will appear as the sender of the SMS.
+          example: MyCompany
+        to:
+          type: string
+          description: Recipient phone number in France (E.164 format, must start with +33)
+          example: '+33612345678'
+        message:
+          type: string
+          description: Message content
+          minLength: 1
+          maxLength: 1000
+          example: Bonjour, ceci est un message de test
     ErrorDetail:
       type: object
       properties:
@@ -238,60 +292,6 @@ components:
           minLength: 1
           maxLength: 1000
           example: Hello, this is a test message
-    SendSMSFranceRequest:
-      type: object
-      description: Request body for sending an SMS message in France using a verified Sender ID
-      required:
-      - sender_id
-      - to
-      - message
-      properties:
-        sender_id:
-          type: string
-          description: Your verified Sender ID (must be verified by the Allo team). This is an alphanumeric identifier that will appear as the sender of the SMS.
-          example: MyCompany
-        to:
-          type: string
-          description: Recipient phone number in France (E.164 format, must start with +33)
-          example: '+33612345678'
-        message:
-          type: string
-          description: Message content
-          minLength: 1
-          maxLength: 1000
-          example: Bonjour, ceci est un message de test
-  responses:
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

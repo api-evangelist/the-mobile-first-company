@@ -168,12 +168,6 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   responses:
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
     ApiUnauthorized:
       description: Invalid or missing API key
       content:
@@ -182,6 +176,12 @@ components:
             $ref: '#/components/schemas/ApiError'
     ApiRateLimited:
       description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
