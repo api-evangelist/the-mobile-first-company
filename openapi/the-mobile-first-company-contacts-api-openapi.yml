@@ -280,6 +280,38 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
+  responses:
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
   schemas:
     ContactContextApiResponse:
       type: object
@@ -382,6 +414,27 @@ components:
           type: string
           description: URL path to retrieve the full conversation history for this contact
           example: /v1/api/contact/cnt_abc123/conversation
+    GetContactContextResponse:
+      type: object
+      description: Standard response wrapper for contact context
+      properties:
+        data:
+          $ref: '#/components/schemas/ContactContextApiResponse'
+    PaginationMeta:
+      type:
+      - object
+      - 'null'
+      description: Pagination metadata wrapper for contacts endpoint
+      properties:
+        pagination:
+          type: object
+          properties:
+            total_pages:
+              type: integer
+              example: 5
+            current_page:
+              type: integer
+              example: 0
     CreateContactRequest:
       type: object
       description: Request body for creating a new contact
@@ -441,71 +494,21 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
-    ContactApiResponse:
+    SearchContactsApiResponse:
       type: object
-      description: Standard response wrapper for a single contact
+      description: Standard response wrapper for paginated contact results
       properties:
         data:
-          $ref: '#/components/schemas/ContactWithEngagementApiResponse'
-    UpdateContactRequest:
-      type: object
-      description: Request body for updating an existing contact. Only provided fields will be updated.
-      properties:
-        name:
-          type:
-          - string
-          - 'null'
-          description: First name
-        last_name:
-          type:
-          - string
-          - 'null'
-          description: Last name
-        job_title:
-          type:
-          - string
-          - 'null'
-          description: Job title
-        website:
-          type:
-          - string
-          - 'null'
-          description: Website URL
-        emails:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-          description: Email addresses (replaces all existing emails)
-        numbers:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-          description: Phone numbers (replaces all existing numbers)
-    GetContactContextResponse:
-      type: object
-      description: Standard response wrapper for contact context
-      properties:
-        data:
-          $ref: '#/components/schemas/ContactContextApiResponse'
-    PaginationMeta:
-      type:
-      - object
-      - 'null'
-      description: Pagination metadata wrapper for contacts endpoint
-      properties:
-        pagination:
           type: object
           properties:
-            total_pages:
-              type: integer
-              example: 5
-            current_page:
-              type: integer
-              example: 0
+            results:
+              type:
+              - array
+              - 'null'
+              items:
+                $ref: '#/components/schemas/ContactWithEngagementApiResponse'
+            metadata:
+              $ref: '#/components/schemas/PaginationMeta'
     ContactActivityApiResponse:
       type: object
       description: A communication activity (call or SMS) with a contact
@@ -652,53 +655,50 @@ components:
           type: string
         field:
           type: string
-    SearchContactsApiResponse:
+    ContactApiResponse:
       type: object
-      description: Standard response wrapper for paginated contact results
+      description: Standard response wrapper for a single contact
       properties:
         data:
-          type: object
-          properties:
-            results:
-              type:
-              - array
-              - 'null'
-              items:
-                $ref: '#/components/schemas/ContactWithEngagementApiResponse'
-            metadata:
-              $ref: '#/components/schemas/PaginationMeta'
-  responses:
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
+          $ref: '#/components/schemas/ContactWithEngagementApiResponse'
+    UpdateContactRequest:
+      type: object
+      description: Request body for updating an existing contact. Only provided fields will be updated.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: First name
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Last name
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title
+        website:
+          type:
+          - string
+          - 'null'
+          description: Website URL
+        emails:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Email addresses (replaces all existing emails)
+        numbers:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Phone numbers (replaces all existing numbers)
   securitySchemes:
     CallsAuth:
       type: apiKey

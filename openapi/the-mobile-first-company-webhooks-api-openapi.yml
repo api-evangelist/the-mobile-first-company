@@ -254,8 +254,8 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   responses:
-    ApiNotFound:
-      description: Resource not found
+    ApiRateLimited:
+      description: Rate limit exceeded
       content:
         application/json:
           schema:
@@ -266,19 +266,73 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
     ApiUnauthorized:
       description: Invalid or missing API key
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
+    WebhookTopic:
+      type: string
+      enum:
+      - call.received
+      - call.triggered
+      - call.answered
+      - call.completed
+      - tag.added
+      - tag.removed
+      - sms.received
+      - sms.sent
+      - contact.created
+      - contact.updated
+      - summary.updated
+      description: An event topic. See the Event Catalog for payloads.
+      example: call.received
+    CreateWebhookApiRequest:
+      type: object
+      required:
+      - url
+      - topics
+      properties:
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL that will receive event deliveries.
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopic'
+          description: Event topics to subscribe to (at least one).
+        description:
+          type: string
+          description: Optional human-readable label.
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
     WebhookEventTypeApiResponse:
       type: object
       properties:
@@ -288,6 +342,25 @@ components:
         description:
           type: string
           example: Inbound call received
+    UpdateWebhookApiRequest:
+      type: object
+      description: All fields optional. Only the fields you provide are changed.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: New HTTPS delivery URL.
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopic'
+          description: Replacement set of event topics.
+        description:
+          type: string
+          description: New label.
+        enabled:
+          type: boolean
+          description: Enable or disable the endpoint.
     WebhookApiResponse:
       type: object
       description: A webhook endpoint.
@@ -324,79 +397,6 @@ components:
           - 'null'
           format: date-time
           description: When the endpoint was created.
-    UpdateWebhookApiRequest:
-      type: object
-      description: All fields optional. Only the fields you provide are changed.
-      properties:
-        url:
-          type: string
-          format: uri
-          description: New HTTPS delivery URL.
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookTopic'
-          description: Replacement set of event topics.
-        description:
-          type: string
-          description: New label.
-        enabled:
-          type: boolean
-          description: Enable or disable the endpoint.
-    WebhookTopic:
-      type: string
-      enum:
-      - call.received
-      - call.triggered
-      - call.answered
-      - call.completed
-      - tag.added
-      - tag.removed
-      - sms.received
-      - sms.sent
-      - contact.created
-      - contact.updated
-      - summary.updated
-      description: An event topic. See the Event Catalog for payloads.
-      example: call.received
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
-    CreateWebhookApiRequest:
-      type: object
-      required:
-      - url
-      - topics
-      properties:
-        url:
-          type: string
-          format: uri
-          description: HTTPS URL that will receive event deliveries.
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookTopic'
-          description: Event topics to subscribe to (at least one).
-        description:
-          type: string
-          description: Optional human-readable label.
   securitySchemes:
     CallsAuth:
       type: apiKey

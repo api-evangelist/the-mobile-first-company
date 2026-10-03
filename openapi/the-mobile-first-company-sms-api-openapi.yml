@@ -156,6 +156,17 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
 components:
   responses:
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
     Forbidden:
       description: Forbidden - API key lacks required scope
       content:
@@ -176,37 +187,7 @@ components:
           example:
             code: API_KEY_INVALID
             details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
   schemas:
-    ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error
-        details:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
-    SendSMSResponse:
-      type: object
-      description: Standard response wrapper for sent SMS
-      properties:
-        data:
-          $ref: '#/components/schemas/TextMessageApiResponse'
     SendSMSFranceRequest:
       type: object
       description: Request body for sending an SMS message in France using a verified Sender ID
@@ -229,13 +210,19 @@ components:
           minLength: 1
           maxLength: 1000
           example: Bonjour, ceci est un message de test
-    ErrorDetail:
+    ErrorResponse:
       type: object
       properties:
-        message:
+        code:
           type: string
-        field:
-          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
     TextMessageApiResponse:
       type: object
       description: Sent SMS message details
@@ -292,6 +279,19 @@ components:
           minLength: 1
           maxLength: 1000
           example: Hello, this is a test message
+    SendSMSResponse:
+      type: object
+      description: Standard response wrapper for sent SMS
+      properties:
+        data:
+          $ref: '#/components/schemas/TextMessageApiResponse'
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
   securitySchemes:
     CallsAuth:
       type: apiKey

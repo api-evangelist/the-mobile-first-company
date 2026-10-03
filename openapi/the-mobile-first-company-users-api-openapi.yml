@@ -167,25 +167,6 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
-  responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
     User:
       type: object
@@ -214,6 +195,26 @@ components:
           type:
           - string
           - 'null'
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
     MeResponse:
       type: object
       description: Information about the authenticated API key and its capabilities
@@ -269,26 +270,25 @@ components:
             write_per_second:
               type: integer
               description: Maximum POST/PUT/DELETE requests per second
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
+  responses:
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   securitySchemes:
     CallsAuth:
       type: apiKey

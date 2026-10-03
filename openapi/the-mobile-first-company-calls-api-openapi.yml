@@ -97,6 +97,17 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
 components:
   responses:
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
     Forbidden:
       description: Forbidden - API key lacks required scope
       content:
@@ -117,18 +128,51 @@ components:
           example:
             code: API_KEY_INVALID
             details: null
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
   schemas:
+    SearchMetadata:
+      type: object
+      description: Pagination metadata for calls endpoint
+      properties:
+        total_pages:
+          type: integer
+          example: 5
+        current_page:
+          type: integer
+          example: 0
+    TranscriptRow:
+      type: object
+      description: A single row in the call transcript
+      properties:
+        source:
+          type: string
+          enum:
+          - AGENT
+          - EXTERNAL
+          - USER
+          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
+        text:
+          type: string
+          description: The transcribed text content
+          example: Hello, how can I help you today?
+        time:
+          type: string
+          format: date-time
+          description: When this transcript entry occurred (ISO 8601 format)
+          example: '2024-01-15T10:30:15'
+        start_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Start time of this segment in seconds from call start
+          example: 15
+        end_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: End time of this segment in seconds from call start
+          example: 18.5
     ErrorResponse:
       type: object
       properties:
@@ -142,6 +186,19 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
+    SearchCallsApiResponse:
+      type: object
+      description: Standard response wrapper for paginated call results
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/CallApiResponse'
+            metadata:
+              $ref: '#/components/schemas/SearchMetadata'
     CallApiResponse:
       type: object
       description: A call record with details about the conversation
@@ -217,19 +274,6 @@ components:
           description: Transcript of the call conversation
           items:
             $ref: '#/components/schemas/TranscriptRow'
-    SearchCallsApiResponse:
-      type: object
-      description: Standard response wrapper for paginated call results
-      properties:
-        data:
-          type: object
-          properties:
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/CallApiResponse'
-            metadata:
-              $ref: '#/components/schemas/SearchMetadata'
     ErrorDetail:
       type: object
       properties:
@@ -237,50 +281,6 @@ components:
           type: string
         field:
           type: string
-    SearchMetadata:
-      type: object
-      description: Pagination metadata for calls endpoint
-      properties:
-        total_pages:
-          type: integer
-          example: 5
-        current_page:
-          type: integer
-          example: 0
-    TranscriptRow:
-      type: object
-      description: A single row in the call transcript
-      properties:
-        source:
-          type: string
-          enum:
-          - AGENT
-          - EXTERNAL
-          - USER
-          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
-        text:
-          type: string
-          description: The transcribed text content
-          example: Hello, how can I help you today?
-        time:
-          type: string
-          format: date-time
-          description: When this transcript entry occurred (ISO 8601 format)
-          example: '2024-01-15T10:30:15'
-        start_seconds:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: Start time of this segment in seconds from call start
-          example: 15
-        end_seconds:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: End time of this segment in seconds from call start
-          example: 18.5
   securitySchemes:
     CallsAuth:
       type: apiKey
