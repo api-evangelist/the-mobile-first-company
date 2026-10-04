@@ -466,7 +466,97 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
+  responses:
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    ApiNotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
   schemas:
+    TranscriptRow:
+      type: object
+      description: A single row in the call transcript
+      properties:
+        source:
+          type: string
+          enum:
+          - AGENT
+          - EXTERNAL
+          - USER
+          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
+        text:
+          type: string
+          description: The transcribed text content
+          example: Hello, how can I help you today?
+        time:
+          type: string
+          format: date-time
+          description: When this transcript entry occurred (ISO 8601 format)
+          example: '2024-01-15T10:30:15'
+        start_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Start time of this segment in seconds from call start
+          example: 15
+        end_seconds:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: End time of this segment in seconds from call start
+          example: 18.5
     CallSummary:
       type: object
       properties:
@@ -503,165 +593,6 @@ components:
               - string
               - 'null'
               example: Alex Kim
-    AnalyticsDateRange:
-      type: object
-      required:
-      - from
-      - to
-      properties:
-        from:
-          type: string
-          format: date
-          description: Start date
-          example: '2026-03-25'
-        to:
-          type: string
-          format: date
-          description: End date
-          example: '2026-04-21'
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
-    TranscriptEntry:
-      type: object
-      properties:
-        source:
-          type: string
-          enum:
-          - USER
-          - EXTERNAL
-        time:
-          type: string
-          format: date-time
-        text:
-          type: string
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        size:
-          type: integer
-        total_count:
-          type: integer
-        total_pages:
-          type: integer
-        has_more:
-          type: boolean
-    PaginatedResponse:
-      type: object
-      properties:
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    ErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error
-        details:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
-    ItemSearchRequest:
-      type: object
-      properties:
-        allo_number:
-          type: string
-        contact_number:
-          type: string
-        user_id:
-          type: string
-        direction:
-          type: string
-          enum:
-          - INBOUND
-          - OUTBOUND
-        type:
-          type: string
-          enum:
-          - CALL
-          - SMS
-          - ALL
-          default: ALL
-        result:
-          type: string
-          enum:
-          - ANSWERED
-          - VOICEMAIL
-          - TRANSFERRED
-        tags:
-          type: array
-          items:
-            type: string
-        unread:
-          type: boolean
-        unresponded:
-          type: boolean
-        search:
-          type: string
-          description: Keyword search (not natural language). Extract keywords from the user's question. Terms are AND'd with prefix matching — 'billing refund' matches items containing both words, 'bill' matches 'billing'. Searches across call transcripts, summaries, and SMS content.
-        sort:
-          type: string
-          enum:
-          - DATE_DESC
-          - DATE_ASC
-          - RELEVANCE
-          default: DATE_DESC
-        extend:
-          type: string
-        page:
-          type: integer
-          default: 1
-        size:
-          type: integer
-          default: 20
-          maximum: 100
-        date:
-          $ref: '#/components/schemas/AnalyticsDateRange'
-          description: Date range to filter by
-    ErrorDetail:
-      type: object
-      properties:
-        message:
-          type: string
-        field:
-          type: string
-    ConversationSummary:
-      type: object
-      properties:
-        contact_number:
-          type: string
-          example: '+14155551234'
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contact'
-        last_activity:
-          type: string
-          format: date-time
-        last_item:
-          $ref: '#/components/schemas/ConversationItem'
     TextMessageApiResponse:
       type: object
       description: Sent SMS message details
@@ -696,148 +627,114 @@ components:
           format: date-time
           description: When the message was sent
           example: '2024-01-15T10:30:00'
-    CallApiResponse:
-      type: object
-      description: A call record with details about the conversation
-      properties:
-        id:
-          type: string
-          description: Unique call identifier
-          example: call_abc123
-        from_number:
-          type: string
-          description: Phone number that initiated the call (E.164 format or 'anonymous')
-          example: '+1234567890'
-        to_number:
-          type:
-          - string
-          - 'null'
-          description: Phone number that received the call
-          example: +0987654321
-        length_in_minutes:
-          type: number
-          format: double
-          description: Duration of the call in minutes
-          example: 5.5
-        type:
-          type:
-          - string
-          - 'null'
-          enum:
-          - INBOUND
-          - OUTBOUND
-          description: Direction of the call
-        result:
-          type: string
-          enum:
-          - ANSWERED
-          - VOICEMAIL
-          - TRANSFERRED_AI
-          - TRANSFERRED_EXTERNAL
-          - BLOCKED
-          - FAILED
-          - FAILED_EXTERNAL
-          - RECEIVED
-          - CLOSED
-          description: 'The outcome of the call. For outbound calls that reached voicemail, this will be VOICEMAIL regardless of the routing result. Common values: ANSWERED (call was answered), VOICEMAIL (call went to voicemail), TRANSFERRED_AI (transferred to AI agent), BLOCKED (call was blocked)'
-          example: ANSWERED
-        summary:
-          type:
-          - string
-          - 'null'
-          description: AI-generated summary of the call conversation
-          example: Customer inquired about order status
-        tag:
-          type:
-          - string
-          - 'null'
-          description: Tag/category assigned to the call
-          example: support
-        recording_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: URL to access the call recording
-        start_date:
-          type: string
-          format: date-time
-          description: When the call started (ISO 8601 format)
-          example: '2024-01-15T10:30:00'
-        transcript:
-          type:
-          - array
-          - 'null'
-          description: Transcript of the call conversation
-          items:
-            $ref: '#/components/schemas/TranscriptRow'
-    UserRef:
+    PaginatedResponse:
       type: object
       properties:
-        id:
-          type: string
-          example: usr-abc123
-        name:
-          type: string
-          example: John
-        email:
-          type: string
-          example: john@acme.com
-    TranscriptRow:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    TranscriptEntry:
       type: object
-      description: A single row in the call transcript
       properties:
         source:
           type: string
           enum:
-          - AGENT
-          - EXTERNAL
           - USER
-          description: The source of this transcript entry (AGENT for AI assistant, EXTERNAL for the caller, USER for the Allo user)
-        text:
-          type: string
-          description: The transcribed text content
-          example: Hello, how can I help you today?
+          - EXTERNAL
         time:
           type: string
           format: date-time
-          description: When this transcript entry occurred (ISO 8601 format)
-          example: '2024-01-15T10:30:15'
-        start_seconds:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: Start time of this segment in seconds from call start
-          example: 15
-        end_seconds:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: End time of this segment in seconds from call start
-          example: 18.5
-    GetContactConversationResponse:
+        text:
+          type: string
+    ApiError:
       type: object
-      description: Standard response wrapper for contact conversation
       properties:
-        data:
-          $ref: '#/components/schemas/ConversationApiResponse'
-    PaginationMeta:
-      type:
-      - object
-      - 'null'
-      description: Pagination metadata wrapper for contacts endpoint
-      properties:
-        pagination:
+        error:
           type: object
           properties:
-            total_pages:
-              type: integer
-              example: 5
-            current_page:
-              type: integer
-              example: 0
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cnt-abc123
+        name:
+          type: string
+          example: Sarah Johnson
+        company:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+              example: com-xyz789
+            name:
+              type: string
+              example: Acme Corp
+        deals:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: dea-def456
+              name:
+                type: string
+                example: Enterprise Plan
+              status:
+                type: string
+                enum:
+                - OPEN
+                - WON
+                - LOST
+    ErrorDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        field:
+          type: string
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
     ConversationApiResponse:
       type: object
       description: Paginated conversation history with calls and messages
@@ -933,43 +830,6 @@ components:
           - SMS
           - MMS
           - WHATSAPP
-    Contact:
-      type: object
-      properties:
-        id:
-          type: string
-          example: cnt-abc123
-        name:
-          type: string
-          example: Sarah Johnson
-        company:
-          type:
-          - object
-          - 'null'
-          properties:
-            id:
-              type: string
-              example: com-xyz789
-            name:
-              type: string
-              example: Acme Corp
-        deals:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                example: dea-def456
-              name:
-                type: string
-                example: Enterprise Plan
-              status:
-                type: string
-                enum:
-                - OPEN
-                - WON
-                - LOST
     ConversationItemApiResponse:
       type: object
       description: A single item in the conversation (either a call or a message)
@@ -986,6 +846,202 @@ components:
         message:
           $ref: '#/components/schemas/TextMessageApiResponse'
           description: Message details (only present when type is TEXT_MESSAGE)
+    CallApiResponse:
+      type: object
+      description: A call record with details about the conversation
+      properties:
+        id:
+          type: string
+          description: Unique call identifier
+          example: call_abc123
+        from_number:
+          type: string
+          description: Phone number that initiated the call (E.164 format or 'anonymous')
+          example: '+1234567890'
+        to_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number that received the call
+          example: +0987654321
+        length_in_minutes:
+          type: number
+          format: double
+          description: Duration of the call in minutes
+          example: 5.5
+        type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - INBOUND
+          - OUTBOUND
+          description: Direction of the call
+        result:
+          type: string
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED_AI
+          - TRANSFERRED_EXTERNAL
+          - BLOCKED
+          - FAILED
+          - FAILED_EXTERNAL
+          - RECEIVED
+          - CLOSED
+          description: 'The outcome of the call. For outbound calls that reached voicemail, this will be VOICEMAIL regardless of the routing result. Common values: ANSWERED (call was answered), VOICEMAIL (call went to voicemail), TRANSFERRED_AI (transferred to AI agent), BLOCKED (call was blocked)'
+          example: ANSWERED
+        summary:
+          type:
+          - string
+          - 'null'
+          description: AI-generated summary of the call conversation
+          example: Customer inquired about order status
+        tag:
+          type:
+          - string
+          - 'null'
+          description: Tag/category assigned to the call
+          example: support
+        recording_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: URL to access the call recording
+        start_date:
+          type: string
+          format: date-time
+          description: When the call started (ISO 8601 format)
+          example: '2024-01-15T10:30:00'
+        transcript:
+          type:
+          - array
+          - 'null'
+          description: Transcript of the call conversation
+          items:
+            $ref: '#/components/schemas/TranscriptRow'
+    PaginationMeta:
+      type:
+      - object
+      - 'null'
+      description: Pagination metadata wrapper for contacts endpoint
+      properties:
+        pagination:
+          type: object
+          properties:
+            total_pages:
+              type: integer
+              example: 5
+            current_page:
+              type: integer
+              example: 0
+    GetContactConversationResponse:
+      type: object
+      description: Standard response wrapper for contact conversation
+      properties:
+        data:
+          $ref: '#/components/schemas/ConversationApiResponse'
+    ItemSearchRequest:
+      type: object
+      properties:
+        allo_number:
+          type: string
+        contact_number:
+          type: string
+        user_id:
+          type: string
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        type:
+          type: string
+          enum:
+          - CALL
+          - SMS
+          - ALL
+          default: ALL
+        result:
+          type: string
+          enum:
+          - ANSWERED
+          - VOICEMAIL
+          - TRANSFERRED
+        tags:
+          type: array
+          items:
+            type: string
+        unread:
+          type: boolean
+        unresponded:
+          type: boolean
+        search:
+          type: string
+          description: Keyword search (not natural language). Extract keywords from the user's question. Terms are AND'd with prefix matching — 'billing refund' matches items containing both words, 'bill' matches 'billing'. Searches across call transcripts, summaries, and SMS content.
+        sort:
+          type: string
+          enum:
+          - DATE_DESC
+          - DATE_ASC
+          - RELEVANCE
+          default: DATE_DESC
+        extend:
+          type: string
+        page:
+          type: integer
+          default: 1
+        size:
+          type: integer
+          default: 20
+          maximum: 100
+        date:
+          $ref: '#/components/schemas/AnalyticsDateRange'
+          description: Date range to filter by
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
+    ConversationSummary:
+      type: object
+      properties:
+        contact_number:
+          type: string
+          example: '+14155551234'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        last_activity:
+          type: string
+          format: date-time
+        last_item:
+          $ref: '#/components/schemas/ConversationItem'
+    AnalyticsDateRange:
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date
+          description: Start date
+          example: '2026-03-25'
+        to:
+          type: string
+          format: date
+          description: End date
+          example: '2026-04-21'
   parameters:
     Page:
       name: page
@@ -1011,62 +1067,6 @@ components:
       schema:
         type: string
         example: transcript
-  responses:
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
   securitySchemes:
     CallsAuth:
       type: apiKey

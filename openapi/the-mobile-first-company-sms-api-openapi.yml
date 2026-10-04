@@ -155,74 +155,20 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
-  responses:
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
   schemas:
-    SendSMSFranceRequest:
+    ErrorDetail:
       type: object
-      description: Request body for sending an SMS message in France using a verified Sender ID
-      required:
-      - sender_id
-      - to
-      - message
       properties:
-        sender_id:
-          type: string
-          description: Your verified Sender ID (must be verified by the Allo team). This is an alphanumeric identifier that will appear as the sender of the SMS.
-          example: MyCompany
-        to:
-          type: string
-          description: Recipient phone number in France (E.164 format, must start with +33)
-          example: '+33612345678'
         message:
           type: string
-          description: Message content
-          minLength: 1
-          maxLength: 1000
-          example: Bonjour, ceci est un message de test
-    ErrorResponse:
-      type: object
-      properties:
-        code:
+        field:
           type: string
-          description: Error code identifying the type of error
-        details:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-          description: Additional error details, or null if not applicable
+    SendSMSResponse:
+      type: object
+      description: Standard response wrapper for sent SMS
+      properties:
+        data:
+          $ref: '#/components/schemas/TextMessageApiResponse'
     TextMessageApiResponse:
       type: object
       description: Sent SMS message details
@@ -279,19 +225,73 @@ components:
           minLength: 1
           maxLength: 1000
           example: Hello, this is a test message
-    SendSMSResponse:
-      type: object
-      description: Standard response wrapper for sent SMS
-      properties:
-        data:
-          $ref: '#/components/schemas/TextMessageApiResponse'
-    ErrorDetail:
+    ErrorResponse:
       type: object
       properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          description: Additional error details, or null if not applicable
+    SendSMSFranceRequest:
+      type: object
+      description: Request body for sending an SMS message in France using a verified Sender ID
+      required:
+      - sender_id
+      - to
+      - message
+      properties:
+        sender_id:
+          type: string
+          description: Your verified Sender ID (must be verified by the Allo team). This is an alphanumeric identifier that will appear as the sender of the SMS.
+          example: MyCompany
+        to:
+          type: string
+          description: Recipient phone number in France (E.164 format, must start with +33)
+          example: '+33612345678'
         message:
           type: string
-        field:
-          type: string
+          description: Message content
+          minLength: 1
+          maxLength: 1000
+          example: Bonjour, ceci est un message de test
+  responses:
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
   securitySchemes:
     CallsAuth:
       type: apiKey

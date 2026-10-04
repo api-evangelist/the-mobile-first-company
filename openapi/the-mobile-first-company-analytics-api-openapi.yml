@@ -249,35 +249,34 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
+  responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
-    AnalyticsDateRange:
-      type: object
-      required:
-      - from
-      - to
-      properties:
-        from:
-          type: string
-          format: date
-          description: Start date
-          example: '2026-03-25'
-        to:
-          type: string
-          format: date
-          description: End date
-          example: '2026-04-21'
-    UserRef:
+    TimeSeriesPoint:
       type: object
       properties:
-        id:
+        date:
           type: string
-          example: usr-abc123
-        name:
-          type: string
-          example: John
-        email:
-          type: string
-          example: john@acme.com
+          format: date
+        value:
+          type: number
     UserBreakdown:
       type: object
       properties:
@@ -291,26 +290,6 @@ components:
           $ref: '#/components/schemas/MetricValue'
         answer_rate:
           $ref: '#/components/schemas/MetricValue'
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
     HeatmapCell:
       type: object
       properties:
@@ -329,73 +308,6 @@ components:
           description: Hour of day (0-23)
         value:
           type: integer
-    TimeSeriesPoint:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        value:
-          type: number
-    FunnelStage:
-      type: object
-      properties:
-        count:
-          $ref: '#/components/schemas/MetricValue'
-        rate:
-          type:
-          - number
-          - 'null'
-          description: Percentage of total dials (e.g. 0.29 = 29%)
-    OutboundDrilldownItem:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Call ID
-          example: cll-abc123
-        user:
-          $ref: '#/components/schemas/UserRef'
-        allo_number:
-          type: string
-          example: '+14155550100'
-        allo_number_label:
-          type: string
-          example: Sales US
-        contact_number:
-          type: string
-          example: '+14155551234'
-        stage:
-          type: string
-          enum:
-          - DIAL
-          - CONNECTED
-          - CONVERSATION
-          - CONVERSION
-        voicemail:
-          type: boolean
-        duration:
-          type: integer
-          description: Duration in seconds
-        date:
-          type: string
-          format: date-time
-    MetricValue:
-      type: object
-      properties:
-        value:
-          type: number
-          description: Current period value
-        previous:
-          type:
-          - number
-          - 'null'
-          description: Previous period value
-        change:
-          type:
-          - number
-          - 'null'
-          description: Percentage change vs previous period (e.g. 0.15 = +15%)
     AnalyticsBaseRequest:
       type: object
       required:
@@ -416,6 +328,18 @@ components:
           items:
             type: string
           description: Filter by Allo numbers (E.164). Cannot be combined with user_ids.
+    UserRef:
+      type: object
+      properties:
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
     OutboundAnalyticsRequest:
       allOf:
       - $ref: '#/components/schemas/AnalyticsBaseRequest'
@@ -456,6 +380,75 @@ components:
             default: 20
             maximum: 100
             description: Page size for drilldown items. Only used when `extend=items`.
+    OutboundDrilldownItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Call ID
+          example: cll-abc123
+        user:
+          $ref: '#/components/schemas/UserRef'
+        allo_number:
+          type: string
+          example: '+14155550100'
+        allo_number_label:
+          type: string
+          example: Sales US
+        contact_number:
+          type: string
+          example: '+14155551234'
+        stage:
+          type: string
+          enum:
+          - DIAL
+          - CONNECTED
+          - CONVERSATION
+          - CONVERSION
+        voicemail:
+          type: boolean
+        duration:
+          type: integer
+          description: Duration in seconds
+        date:
+          type: string
+          format: date-time
+    AnalyticsDateRange:
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date
+          description: Start date
+          example: '2026-03-25'
+        to:
+          type: string
+          format: date
+          description: End date
+          example: '2026-04-21'
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
     Pagination:
       type: object
       properties:
@@ -469,25 +462,32 @@ components:
           type: integer
         has_more:
           type: boolean
-  responses:
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiValidationError:
-      description: Invalid request parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
+    MetricValue:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Current period value
+        previous:
+          type:
+          - number
+          - 'null'
+          description: Previous period value
+        change:
+          type:
+          - number
+          - 'null'
+          description: Percentage change vs previous period (e.g. 0.15 = +15%)
+    FunnelStage:
+      type: object
+      properties:
+        count:
+          $ref: '#/components/schemas/MetricValue'
+        rate:
+          type:
+          - number
+          - 'null'
+          description: Percentage of total dials (e.g. 0.29 = 29%)
   securitySchemes:
     CallsAuth:
       type: apiKey

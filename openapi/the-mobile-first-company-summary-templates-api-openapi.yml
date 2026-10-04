@@ -365,26 +365,26 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   responses:
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
     ApiValidationError:
       description: Invalid request parameters
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
+    ApiUnauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ApiNotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -419,6 +419,19 @@ components:
         updated_at:
           type: string
           format: date-time
+    SummaryTemplateSection:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Pain points
+        instructions:
+          type: string
+          example: List the prospect's pain points
+        order:
+          type: integer
+          description: 0-based position of the section in the summary.
+          example: 0
     ApiError:
       type: object
       properties:
@@ -439,19 +452,6 @@ components:
               type:
               - integer
               - 'null'
-    SummaryTemplateSection:
-      type: object
-      properties:
-        title:
-          type: string
-          example: Pain points
-        instructions:
-          type: string
-          example: List the prospect's pain points
-        order:
-          type: integer
-          description: 0-based position of the section in the summary.
-          example: 0
   securitySchemes:
     CallsAuth:
       type: apiKey

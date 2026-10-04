@@ -126,6 +126,12 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   responses:
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
     ApiRateLimited:
       description: Rate limit exceeded
       content:
@@ -138,13 +144,19 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tag-abc123
+        name:
+          type: string
+          example: qualified
+        color:
+          type: string
+          example: '#00AA00'
     ApiError:
       type: object
       properties:
@@ -165,18 +177,6 @@ components:
               type:
               - integer
               - 'null'
-    Tag:
-      type: object
-      properties:
-        id:
-          type: string
-          example: tag-abc123
-        name:
-          type: string
-          example: qualified
-        color:
-          type: string
-          example: '#00AA00'
   securitySchemes:
     CallsAuth:
       type: apiKey
