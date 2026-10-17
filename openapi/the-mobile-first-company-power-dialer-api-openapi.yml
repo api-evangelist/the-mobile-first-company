@@ -499,6 +499,68 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
+    DialingQueue:
+      type: object
+      description: A user's Power Dialer queue with its configuration and numbers.
+      properties:
+        id:
+          type: string
+          description: Unique queue identifier (KSUID with `pdl` prefix)
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name of the queue
+        creator_id:
+          type: string
+          description: User ID of the queue creator — the user (or API key owner) that created the queue.
+        assignee_id:
+          type:
+          - string
+          - 'null'
+          description: User ID of the user expected to run the queue. `GET /current` returns the queue where this matches the authenticated user (or the user resolved from `user_id` / `email`). Defaults to the creator when none was specified at creation time.
+        voicemail_handling:
+          type: string
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call lands in voicemail. `SKIP` advances to the next number; `NO_SKIP` keeps the user on the call.
+        do_not_disturb:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
+        numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueueNumber'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
     AppendQueueNumbersResponse:
       type: object
       properties:
@@ -521,14 +583,42 @@ components:
                 enum:
                 - INVALID_PHONE_NUMBER
                 description: Why the number was skipped
-    ClearQueueNumbersResponse:
+    Pagination:
       type: object
-      description: Result of clearing numbers from a Power Dialer queue.
       properties:
-        removed:
+        page:
           type: integer
-          description: Number of queue entries that were removed.
-          example: 4
+        size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+        has_more:
+          type: boolean
+    ResetDialingQueueRequest:
+      type: object
+      description: Optional payload for resetting a queue. Send an empty body to reset your own queue without renaming.
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name for the new queue (max 255 characters). Leave unset to create the queue without a name.
+          maxLength: 255
+        user_id:
+          type:
+          - string
+          - 'null'
+          description: Optional. ID of a teammate the new queue should be assigned to. The API key owner is recorded as `creator_id`. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
+          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Optional. Email of a teammate the new queue should be assigned to. Ignored when `user_id` is also supplied.
+          example: teammate@acme.com
     QueueNumber:
       type: object
       description: A phone number entry in a Power Dialer queue
@@ -670,134 +760,14 @@ components:
           format: email
           description: Optional. Email of a teammate whose queue should receive the numbers. Ignored when `user_id` is also supplied.
           example: teammate@acme.com
-    DialingQueueMeta:
+    ClearQueueNumbersResponse:
       type: object
-      description: Power Dialer queue metadata, without its numbers. Returned under the `queue` key of `GET /current`; the numbers themselves are the paginated `data`.
+      description: Result of clearing numbers from a Power Dialer queue.
       properties:
-        id:
-          type: string
-          description: Unique queue identifier (KSUID with `pdl` prefix)
-        name:
-          type:
-          - string
-          - 'null'
-          description: Display name of the queue
-        creator_id:
-          type: string
-          description: User ID of the queue creator.
-        assignee_id:
-          type:
-          - string
-          - 'null'
-          description: User ID of the user expected to run the queue.
-        voicemail_handling:
-          type: string
-          enum:
-          - SKIP
-          - NO_SKIP
-          description: How the Power Dialer reacts when the call lands in voicemail.
-        do_not_disturb:
-          type: string
-          enum:
-          - ENABLED
-          - DISABLED
-          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    ResetDialingQueueRequest:
-      type: object
-      description: Optional payload for resetting a queue. Send an empty body to reset your own queue without renaming.
-      properties:
-        name:
-          type:
-          - string
-          - 'null'
-          description: Display name for the new queue (max 255 characters). Leave unset to create the queue without a name.
-          maxLength: 255
-        user_id:
-          type:
-          - string
-          - 'null'
-          description: Optional. ID of a teammate the new queue should be assigned to. The API key owner is recorded as `creator_id`. The teammate must belong to the same team as the API key owner. Wins over `email` when both are provided.
-          example: usr-15BB68317A7F06F0C07A3BBD8F244102A6872220
-        email:
-          type:
-          - string
-          - 'null'
-          format: email
-          description: Optional. Email of a teammate the new queue should be assigned to. Ignored when `user_id` is also supplied.
-          example: teammate@acme.com
-    PaginatedResponse:
-      type: object
-      properties:
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    DialingQueue:
-      type: object
-      description: A user's Power Dialer queue with its configuration and numbers.
-      properties:
-        id:
-          type: string
-          description: Unique queue identifier (KSUID with `pdl` prefix)
-        name:
-          type:
-          - string
-          - 'null'
-          description: Display name of the queue
-        creator_id:
-          type: string
-          description: User ID of the queue creator — the user (or API key owner) that created the queue.
-        assignee_id:
-          type:
-          - string
-          - 'null'
-          description: User ID of the user expected to run the queue. `GET /current` returns the queue where this matches the authenticated user (or the user resolved from `user_id` / `email`). Defaults to the creator when none was specified at creation time.
-        voicemail_handling:
-          type: string
-          enum:
-          - SKIP
-          - NO_SKIP
-          description: How the Power Dialer reacts when the call lands in voicemail. `SKIP` advances to the next number; `NO_SKIP` keeps the user on the call.
-        do_not_disturb:
-          type: string
-          enum:
-          - ENABLED
-          - DISABLED
-          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
-        numbers:
-          type: array
-          items:
-            $ref: '#/components/schemas/QueueNumber'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
+        removed:
+          type: integer
+          description: Number of queue entries that were removed.
+          example: 4
     UpsertDialingQueueRequest:
       type: object
       description: Creates or updates the queue config. All fields are optional — only the fields you supply are touched. Pass `user_id` or `email` to act on a teammate's queue instead.
@@ -838,22 +808,52 @@ components:
           format: email
           description: Optional. Email of a teammate whose queue config should be updated. Ignored when `user_id` is also supplied.
           example: teammate@acme.com
-    Pagination:
+    DialingQueueMeta:
+      type: object
+      description: Power Dialer queue metadata, without its numbers. Returned under the `queue` key of `GET /current`; the numbers themselves are the paginated `data`.
+      properties:
+        id:
+          type: string
+          description: Unique queue identifier (KSUID with `pdl` prefix)
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name of the queue
+        creator_id:
+          type: string
+          description: User ID of the queue creator.
+        assignee_id:
+          type:
+          - string
+          - 'null'
+          description: User ID of the user expected to run the queue.
+        voicemail_handling:
+          type: string
+          enum:
+          - SKIP
+          - NO_SKIP
+          description: How the Power Dialer reacts when the call lands in voicemail.
+        do_not_disturb:
+          type: string
+          enum:
+          - ENABLED
+          - DISABLED
+          description: When `ENABLED`, incoming calls are silenced while the queue is being run.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaginatedResponse:
       type: object
       properties:
-        page:
-          type: integer
-        size:
-          type: integer
-        total_count:
-          type: integer
-        total_pages:
-          type: integer
-        has_more:
-          type: boolean
+        pagination:
+          $ref: '#/components/schemas/Pagination'
   responses:
-    ApiValidationError:
-      description: Invalid request parameters
+    ApiUnauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:
@@ -864,8 +864,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
+    ApiValidationError:
+      description: Invalid request parameters
       content:
         application/json:
           schema:

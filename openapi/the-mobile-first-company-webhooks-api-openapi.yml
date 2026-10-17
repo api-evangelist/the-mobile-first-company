@@ -254,6 +254,26 @@ paths:
           $ref: '#/components/responses/ApiRateLimited'
 components:
   schemas:
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
     WebhookTopic:
       type: string
       enum:
@@ -343,26 +363,6 @@ components:
           - 'null'
           format: date-time
           description: When the endpoint was created.
-    ApiError:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
     WebhookEventTypeApiResponse:
       type: object
       properties:
@@ -373,14 +373,14 @@ components:
           type: string
           example: Inbound call received
   responses:
-    ApiValidationError:
-      description: Invalid request parameters
+    ApiUnauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiUnauthorized:
-      description: Invalid or missing API key
+    ApiNotFound:
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -391,8 +391,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    ApiNotFound:
-      description: Resource not found
+    ApiValidationError:
+      description: Invalid request parameters
       content:
         application/json:
           schema:

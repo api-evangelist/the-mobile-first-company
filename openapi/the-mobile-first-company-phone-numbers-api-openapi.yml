@@ -107,14 +107,96 @@ paths:
         '429':
           $ref: '#/components/responses/ApiRateLimited'
 components:
+  responses:
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    ApiUnauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    ApiRateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
   schemas:
-    ErrorDetail:
+    ApiError:
       type: object
       properties:
-        message:
-          type: string
-        field:
-          type: string
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            request_id:
+              type: string
+            retry_after_seconds:
+              type:
+              - integer
+              - 'null'
+    PhoneNumberApiResponse:
+      type: object
+      description: An Allo phone number with basic information
+      properties:
+        number:
+          type:
+          - string
+          - 'null'
+          description: Phone number in E.164 format
+          example: '+1234567890'
+        name:
+          type:
+          - string
+          - 'null'
+          description: Display name for the phone number
+          example: Main Line
+        country:
+          type:
+          - string
+          - 'null'
+          description: Two-letter country code (ISO 3166-1 alpha-2)
+          example: US
+        is_shared_number:
+          type: boolean
+          description: Whether this number is shared across team members
     PhoneNumber:
       type: object
       properties:
@@ -160,43 +242,21 @@ components:
           description: Team members with access to this number
           items:
             $ref: '#/components/schemas/UserRef'
-    UserRef:
+    GetNumbersResponse:
+      type: object
+      description: Standard response wrapper containing list of phone numbers
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneNumberApiResponse'
+    ErrorDetail:
       type: object
       properties:
-        id:
+        message:
           type: string
-          example: usr-abc123
-        name:
+        field:
           type: string
-          example: John
-        email:
-          type: string
-          example: john@acme.com
-    PhoneNumberApiResponse:
-      type: object
-      description: An Allo phone number with basic information
-      properties:
-        number:
-          type:
-          - string
-          - 'null'
-          description: Phone number in E.164 format
-          example: '+1234567890'
-        name:
-          type:
-          - string
-          - 'null'
-          description: Display name for the phone number
-          example: Main Line
-        country:
-          type:
-          - string
-          - 'null'
-          description: Two-letter country code (ISO 3166-1 alpha-2)
-          example: US
-        is_shared_number:
-          type: boolean
-          description: Whether this number is shared across team members
     ErrorResponse:
       type: object
       properties:
@@ -210,78 +270,18 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
-    ApiError:
+    UserRef:
       type: object
       properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-            code:
-              type: string
-            message:
-              type: string
-            retryable:
-              type: boolean
-            request_id:
-              type: string
-            retry_after_seconds:
-              type:
-              - integer
-              - 'null'
-    GetNumbersResponse:
-      type: object
-      description: Standard response wrapper containing list of phone numbers
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PhoneNumberApiResponse'
-  responses:
-    ApiUnauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    ApiRateLimited:
-      description: Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
+        id:
+          type: string
+          example: usr-abc123
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@acme.com
   securitySchemes:
     CallsAuth:
       type: apiKey

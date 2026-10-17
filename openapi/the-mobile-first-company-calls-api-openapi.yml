@@ -96,7 +96,62 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
+  responses:
+    Forbidden:
+      description: Forbidden - API key lacks required scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INSUFFICIENT_SCOPE
+            details:
+            - message: required=CONTACTS_READ
+              field: scope
+    Unauthorized:
+      description: Unauthorized - Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_INVALID
+            details: null
+    TooManyRequests:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: API_KEY_QUOTA_EXCEEDED
+            details:
+            - message: limit=1000;type=DAILY;reset_in=3600
+              field: DAILY
   schemas:
+    SearchMetadata:
+      type: object
+      description: Pagination metadata for calls endpoint
+      properties:
+        total_pages:
+          type: integer
+          example: 5
+        current_page:
+          type: integer
+          example: 0
+    SearchCallsApiResponse:
+      type: object
+      description: Standard response wrapper for paginated call results
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/CallApiResponse'
+            metadata:
+              $ref: '#/components/schemas/SearchMetadata'
     ErrorDetail:
       type: object
       properties:
@@ -138,19 +193,6 @@ components:
           format: double
           description: End time of this segment in seconds from call start
           example: 18.5
-    SearchCallsApiResponse:
-      type: object
-      description: Standard response wrapper for paginated call results
-      properties:
-        data:
-          type: object
-          properties:
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/CallApiResponse'
-            metadata:
-              $ref: '#/components/schemas/SearchMetadata'
     ErrorResponse:
       type: object
       properties:
@@ -164,16 +206,6 @@ components:
           items:
             $ref: '#/components/schemas/ErrorDetail'
           description: Additional error details, or null if not applicable
-    SearchMetadata:
-      type: object
-      description: Pagination metadata for calls endpoint
-      properties:
-        total_pages:
-          type: integer
-          example: 5
-        current_page:
-          type: integer
-          example: 0
     CallApiResponse:
       type: object
       description: A call record with details about the conversation
@@ -249,38 +281,6 @@ components:
           description: Transcript of the call conversation
           items:
             $ref: '#/components/schemas/TranscriptRow'
-  responses:
-    Unauthorized:
-      description: Unauthorized - Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INVALID
-            details: null
-    Forbidden:
-      description: Forbidden - API key lacks required scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_INSUFFICIENT_SCOPE
-            details:
-            - message: required=CONTACTS_READ
-              field: scope
-    TooManyRequests:
-      description: Too Many Requests - Rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            code: API_KEY_QUOTA_EXCEEDED
-            details:
-            - message: limit=1000;type=DAILY;reset_in=3600
-              field: DAILY
   securitySchemes:
     CallsAuth:
       type: apiKey
